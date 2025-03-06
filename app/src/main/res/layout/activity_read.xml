@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.zx.read.ui.PageView
+            android:id="@+id/page_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </com.zx.read.ui.PageView>
+
+        <View
+            android:id="@+id/text_menu_position"
+            android:layout_width="1dp"
+            android:layout_height="1dp"
+            android:visibility="visible" />
+
+        <ImageView
+            android:id="@+id/cursor_left"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_cursor_left"
+            android:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/cursor_right"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_cursor_right"
+            android:visibility="invisible" />
+    </FrameLayout>
+</layout>
