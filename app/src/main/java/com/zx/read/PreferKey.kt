@@ -19,4 +19,6 @@ object PreferKey {
     const val barElevation = "barElevation"
     const val transparentStatusBar = "transparentStatusBar"
     const val replaceEnableDefault = "replaceEnableDefault"
+    const val showBrightnessView = "showBrightnessView"
+
 }

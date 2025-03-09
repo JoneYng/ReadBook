@@ -4,28 +4,34 @@ import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil.setContentView
 import com.zx.read.bean.Book
+import com.zx.read.dialog.ReadStyleDialog
+import com.zx.read.dialog.TextActionMenu
 import com.zx.read.extensions.invisible
+import com.zx.read.extensions.statusBarHeight
 import com.zx.read.extensions.visible
 import com.zx.read.factory.TextPageFactory
 import com.zx.read.ui.ContentTextView
 import com.zx.read.ui.PageView
+import com.zx.read.ui.ReadMenu
 import com.zx.readbook.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.toast
 
-class ReadActivity : AppCompatActivity(),
-    View.OnTouchListener, PageView.CallBack, ContentTextView.CallBack,
-    ReadBook.CallBack,
+class ReadActivity : AppCompatActivity(), View.OnTouchListener, PageView.CallBack,
+    TextActionMenu.CallBack, ContentTextView.CallBack, ReadBook.CallBack, ReadMenu.CallBack,
     CoroutineScope by MainScope() {
     lateinit var pageView: PageView
+    lateinit var readMenu: ReadMenu
     lateinit var textMenuPosition: View
     lateinit var cursorLeft: ImageView
     lateinit var cursorRight: ImageView
@@ -36,25 +42,26 @@ class ReadActivity : AppCompatActivity(),
     override val isInitFinish: Boolean get() = true
     override val isAutoPage: Boolean get() = false
     override val autoPageProgress: Int get() = 0
+    override val selectedText: String
+        get() = pageView.curPage.selectedText
+
+
+    override fun onMenuActionFinally() {
+    }
+
+    private val textActionMenu: TextActionMenu by lazy {
+        TextActionMenu(this, this)
+    }
+
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouch(v: View, event: MotionEvent): Boolean {
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
-//                textActionMenu.dismiss()
+                textActionMenu.dismiss()
             }
-
             MotionEvent.ACTION_MOVE -> {
-                when (v.id) {
-                    R.id.cursor_left -> pageView.curPage.selectStartMove(
-                        event.rawX + cursorLeft.width,
-                        event.rawY - cursorLeft.height
-                    )
-                    R.id.cursor_right -> pageView.curPage.selectEndMove(
-                        event.rawX - cursorRight.width,
-                        event.rawY - cursorRight.height
-                    )
-                }
+                handleCursorSelection(event, cursorLeft, cursorRight,v, pageView)
             }
 
             MotionEvent.ACTION_UP -> showTextActionMenu()
@@ -66,7 +73,6 @@ class ReadActivity : AppCompatActivity(),
         cursorLeft.visible(true)
         cursorLeft.x = x - cursorLeft.width
         cursorLeft.y = y
-        Log.i("zxzx","upSelectedStart:"+cursorLeft.x+"==="+cursorLeft.y )
         textMenuPosition.x = x
         textMenuPosition.y = top
     }
@@ -80,17 +86,18 @@ class ReadActivity : AppCompatActivity(),
     override fun onCancelSelect() {
         cursorLeft.invisible()
         cursorRight.invisible()
-//        textActionMenu.dismiss()
+        textActionMenu.dismiss()
     }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_read)
-        pageView =findViewById<PageView>(R.id.page_view)
+        pageView = findViewById<PageView>(R.id.page_view)
         textMenuPosition = findViewById<View>(R.id.text_menu_position)
         cursorLeft = findViewById<ImageView>(R.id.cursor_left)
         cursorRight = findViewById<ImageView>(R.id.cursor_right)
+        readMenu = findViewById<ReadMenu>(R.id.read_menu)
         ReadBook.callBack = this
         initView()
         ReadBook.loadContent(resetPageOffset = true)
@@ -109,17 +116,40 @@ class ReadActivity : AppCompatActivity(),
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-       ReadBook.loadContent(resetPageOffset = false)
+        ReadBook.loadContent(resetPageOffset = false)
     }
 
     override fun clickCenter() {
-        App.INSTANCE.toast("点击中间")
+        readMenu.runMenuIn()
     }
 
     override fun screenOffTimerStart() {
     }
 
     override fun showTextActionMenu() {
+        textActionMenu.let { popup ->
+            popup.contentView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+            val popupHeight = popup.contentView.measuredHeight
+            val x = textMenuPosition.x.toInt()
+            var y = textMenuPosition.y.toInt() - popupHeight/2
+            if (y < statusBarHeight) {
+                y = (cursorLeft.y + cursorLeft.height).toInt()
+            }
+            if (cursorRight.y > y && cursorRight.y < y + popupHeight) {
+                y = (cursorRight.y + cursorRight.height).toInt()
+            }
+            if (!popup.isShowing) {
+                popup.showAtLocation(textMenuPosition, Gravity.TOP or Gravity.START, x, y)
+            } else {
+                popup.update(
+                    x,
+                    y,
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            }
+        }
+
     }
 
     override fun loadChapterList(book: Book) {
@@ -128,18 +158,22 @@ class ReadActivity : AppCompatActivity(),
     override fun upContent(relativePosition: Int, resetPageOffset: Boolean) {
         launch {
             pageView.upContent(relativePosition, resetPageOffset)
-
+            readMenu.setSeekPage(ReadBook.durPageIndex)
         }
     }
-    override fun upView() {
 
+    override fun upView() {
+        readMenu.upBookView()
     }
+
     override fun pageChanged() {
+        readMenu.setSeekPage(ReadBook.durPageIndex)
     }
 
     override fun contentLoadFinish() {
 
     }
+
     override fun upPageAnim() {
         launch {
             pageView.upPageAnim()
@@ -151,5 +185,28 @@ class ReadActivity : AppCompatActivity(),
         pageView.onDestroy()
         ReadBook.msg = null
     }
+
+
+    override fun openChapterList() {
+//        ReadBook.book?.let {
+//            startActivityForResult<ChapterListActivity>(
+//                requestCodeChapterList,
+//                Pair("bookId", it.bookId.toString())
+//            )
+//        }
+    }
+
+    override fun showAdjust() {
+    }
+
+    override fun showReadStyle() {
+        ReadStyleDialog {
+            pageView.upBg()
+            pageView.upTipStyle()
+            pageView.upStyle()
+            ReadBook.loadContent(resetPageOffset = false)
+        }.show(supportFragmentManager, "readStyle")
+    }
+
 
 }

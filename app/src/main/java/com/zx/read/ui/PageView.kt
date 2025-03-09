@@ -23,6 +23,7 @@ import com.zx.read.delegate.SimulationPageDelegate
 import com.zx.read.delegate.SlidePageDelegate
 import com.zx.read.extensions.activity
 import com.zx.read.extensions.screenshot
+import com.zx.read.provider.ChapterProvider
 import com.zx.readbook.R
 import kotlin.math.abs
 
@@ -107,6 +108,18 @@ class PageView(context: Context, attrs: AttributeSet) :
         curPage.setBg(ReadBookConfig.bg)
         prevPage.setBg(ReadBookConfig.bg)
         nextPage.setBg(ReadBookConfig.bg)
+    }
+    fun upTipStyle() {
+        curPage.upTipStyle()
+        prevPage.upTipStyle()
+        nextPage.upTipStyle()
+    }
+
+    fun upStyle() {
+        ChapterProvider.upStyle()
+        curPage.upStyle()
+        prevPage.upStyle()
+        nextPage.upStyle()
     }
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)

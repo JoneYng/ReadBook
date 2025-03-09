@@ -14,7 +14,8 @@
         <com.zx.read.ui.PageView
             android:id="@+id/page_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:visibility="visible">
 
         </com.zx.read.ui.PageView>
 
@@ -37,5 +38,12 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_cursor_right"
             android:visibility="invisible" />
+
+        <com.zx.read.ui.ReadMenu
+            android:id="@+id/read_menu"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            tools:visibility="visible" />
     </FrameLayout>
 </layout>

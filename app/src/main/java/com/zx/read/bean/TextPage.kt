@@ -3,6 +3,7 @@ package com.zx.read.bean
 import android.text.Layout
 import android.text.StaticLayout
 import com.zx.read.config.ReadBookConfig
+import com.zx.read.extensions.dp
 import com.zx.read.provider.ChapterProvider
 import java.text.DecimalFormat
 
@@ -35,7 +36,7 @@ data class TextPage(
         if (textLines.size <= 1) return@apply
         if (textLines.last().isImage) return@apply
         if (visibleHeight - height >= with(textLines.last()) { lineBottom - lineTop }) return@apply
-        val surplus = (visibleBottom - textLines.last().lineBottom)
+        val surplus = (visibleBottom - textLines.last().lineBottom - ReadBookConfig.paddingBottom.dp)
         if (surplus == 0f) return@apply
         height += surplus
         val tj = surplus / (textLines.size - 1)

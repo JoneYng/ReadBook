@@ -18,15 +18,20 @@ import org.jetbrains.anko.toast
 object ReadBook {
     var book: Book? = null
     var chapterSize = 0
+
     //当前章节位置
     var durChapterIndex = 0
+
     //当前页面位置
     var durPageIndex = 0
     var callBack: CallBack? = null
+
     //上一章节
     var prevTextChapter: TextChapter? = null
+
     //当前章节
     var curTextChapter: TextChapter? = null
+
     //下一章节
     var nextTextChapter: TextChapter? = null
     var msg: String? = null
@@ -85,6 +90,13 @@ object ReadBook {
         synchronized(this) {
             loadingChapters.remove(index)
         }
+    }
+
+    fun skipToPage(page: Int) {
+        durPageIndex = page
+        callBack?.upContent()
+        curPageChanged()
+        saveRead()
     }
 
     fun setPageIndex(pageIndex: Int) {
@@ -190,11 +202,11 @@ object ReadBook {
                 val book = Book(
                     authorPenname = "作者",
                     bookId = 1,
-                    bookName = "盗墓笔记",
+                    bookName = "政治经济学",
                     bookStatus = "",
                     categoryName = "类别名称",
                     channelName = "频道名称",
-                    cName = "盗墓笔记c",
+                    cName = "政治经济学C",
                     coverImageUrl = "https://png.pngtree.com/thumb_back/fh260/background/20210331/pngtree-beautiful-cartoon-cloud-color-mobile-phone-wallpaper-image_598219.jpg",
                     introduction = "简介简介",
                     keyWord = "keyWord",
@@ -208,48 +220,24 @@ object ReadBook {
                     chapterId = 11,
                     bookId = 1,
                     chapterIndex = 0,
-                    chapterName = "七星鲁王 第一章 50年后",
+                    chapterName = "第一篇 导论",
                     createTimeValue = 0,
                     updateDate = "",
                     updateTimeValue = 0,
                     chapterUrl = ""
                 )
                 var it =
-                    "   50年后，河坊街西泠社，我的思绪被一个老头子打断了，我合上我爷爷的笔记，打量了一下对方。\n" +
-                            "    他皱起眉头，说到，“叫你小子平时多跟我学点东西，你就是不听，这东西明眼人一看就看出来了，这是张地图。\n" +
-                            "    他皱起眉头，说到，“叫你小子平时多跟我学点东西，你就是不听，这东西明眼人一看就看出来了，这是张地图。\n" +
-                            "    他皱起眉头，说到，“叫你小子平时多跟我学点东西，你就是不听，这东西明眼人一看就看出来了，这是张地图。\n" +
-                            "    他皱起眉头，说到，“叫你小子平时多跟我学点东西，你就是不听，这东西明眼人一看就看出来了，这是张地图。\n" +
-                            "    他皱起眉头，说到，“叫你小子平时多跟我学点东西，你就是不听，这东西明眼人一看就看出来了，这是张地图。\n" +
-                            "    他皱起眉头，说到，“叫你小子平时多跟我学点东西，你就是不听，这东西明眼人一看就看出来了，这是张地图。\n" +
-                            "    他皱起眉头，说到，“叫你小子平时多跟我学点东西，你就是不听，这东西明眼人一看就看出来了，这是张地图。\n" +
-                            "    他皱起眉头，说到，“叫你小子平时多跟我学点东西，你就是不听，这东西明眼人一看就看出来了，这是张地图。\n" +
-                            "    他皱起眉头，说到，“叫你小子平时多跟我学点东西，你就是不听，这东西明眼人一看就看出来了，这是张地图。\n" +
-                            "    他皱起眉头，说到，“叫你小子平时多跟我学点东西，你就是不听，这东西明眼人一看就看出来了，这是张地图。\n" +
-                            "    他皱起眉头，说到，“叫你小子平时多跟我学点东西，你就是不听，这东西明眼人一看就看出来了，这是张地图。\n" +
-                            "    他皱起眉头，说到，“叫你小子平时多跟我学点东西，你就是不听，这东西明眼人一看就看出来了，这是张地图。\n" +
-                            "    他皱起眉头，说到，“叫你小子平时多跟我学点东西，你就是不听，这东西明眼人一看就看出来了，这是张地图。\n" +
-                            "    他皱起眉头，说到，“叫你小子平时多跟我学点东西，你就是不听，这东西明眼人一看就看出来了，这是张地图。\n" +
-                            "    他皱起眉头，说到，“叫你小子平时多跟我学点东西，你就是不听，这东西明眼人一看就看出来了，这是张地图。\n" +
-                            "    他皱起眉头，说到，“叫你小子平时多跟我学点东西，你就是不听，这东西明眼人一看就看出来了，这是张地图。\n" +
-                            "    他皱起眉头，说到，“叫你小子平时多跟我学点东西，你就是不听，这东西明眼人一看就看出来了，这是张地图。\n"
+                    "资本主义的发展及内在矛盾的尖锐化马克思主义产生于 19世纪 40每代。马克思、恩格斯生活的时代，" + "贫不主义生广万式住四 欧已经有了相当的发展，资本主义一方面带来了社会化大生产的迅猛发展，" + "另一方面又造成了 深重的社会灾难：一是社会两极分化，二是周期性经济危机频繁爆发。资本主义" + "内在的、固有 的矛盾已经暴露出来，预示着未来社会革命的性质和历史发展的方向\n"+
+                    "资本主义的发展及内在矛盾的尖锐化马克思主义产生于 19世纪 40每代。马克思、恩格斯生活的时代，" + "贫不主义生广万式住四 欧已经有了相当的发展，资本主义一方面带来了社会化大生产的迅猛发展，" + "另一方面又造成了 深重的社会灾难：一是社会两极分化，二是周期性经济危机频繁爆发。资本主义" + "内在的、固有 的矛盾已经暴露出来，预示着未来社会革命的性质和历史发展的方向\n"+
+                    "资本主义的发展及内在矛盾的尖锐化马克思主义产生于 19世纪 40每代。马克思、恩格斯生活的时代，" + "贫不主义生广万式住四 欧已经有了相当的发展，资本主义一方面带来了社会化大生产的迅猛发展，" + "另一方面又造成了 深重的社会灾难：一是社会两极分化，二是周期性经济危机频繁爆发。资本主义" + "内在的、固有 的矛盾已经暴露出来，预示着未来社会革命的性质和历史发展的方向\n"+
+                    "资本主义的发展及内在矛盾的尖锐化马克思主义产生于 19世纪 40每代。马克思、恩格斯生活的时代，" + "贫不主义生广万式住四 欧已经有了相当的发展，资本主义一方面带来了社会化大生产的迅猛发展，" + "另一方面又造成了 深重的社会灾难：一是社会两极分化，二是周期性经济危机频繁爆发。资本主义" + "内在的、固有 的矛盾已经暴露出来，预示着未来社会革命的性质和历史发展的方向\n"+
+                    "资本主义的发展及内在矛盾的尖锐化马克思主义产生于 19世纪 40每代。马克思、恩格斯生活的时代，" + "贫不主义生广万式住四 欧已经有了相当的发展，资本主义一方面带来了社会化大生产的迅猛发展，" + "另一方面又造成了 深重的社会灾难：一是社会两极分化，二是周期性经济危机频繁爆发。资本主义" + "内在的、固有 的矛盾已经暴露出来，预示着未来社会革命的性质和历史发展的方向\n"+
+                    "资本主义的发展及内在矛盾的尖锐化马克思主义产生于 19世纪 40每代。马克思、恩格斯生活的时代，" + "贫不主义生广万式住四 欧已经有了相当的发展，资本主义一方面带来了社会化大生产的迅猛发展，" + "另一方面又造成了 深重的社会灾难：一是社会两极分化，二是周期性经济危机频繁爆发。资本主义" + "内在的、固有 的矛盾已经暴露出来，预示着未来社会革命的性质和历史发展的方向\n"+
+                    "资本主义的发展及内在矛盾的尖锐化马克思主义产生于 19世纪 40每代。马克思、恩格斯生活的时代，" + "贫不主义生广万式住四 欧已经有了相当的发展，资本主义一方面带来了社会化大生产的迅猛发展，" + "另一方面又造成了 深重的社会灾难：一是社会两极分化，二是周期性经济危机频繁爆发。资本主义" + "内在的、固有 的矛盾已经暴露出来，预示着未来社会革命的性质和历史发展的方向\n"+
+                    "资本主义的发展及内在矛盾的尖锐化马克思主义产生于 19世纪 40每代。马克思、恩格斯生活的时代，" + "贫不主义生广万式住四 欧已经有了相当的发展，资本主义一方面带来了社会化大生产的迅猛发展，" + "另一方面又造成了 深重的社会灾难：一是社会两极分化，二是周期性经济危机频繁爆发。资本主义" + "内在的、固有 的矛盾已经暴露出来，预示着未来社会革命的性质和历史发展的方向\n"
 //                    //处理内容
                 contentLoadFinish(book, chapter, it, upContent, resetPageOffset)
                 removeLoading(chapter.chapterIndex)
-//                    //通过章节id找到对应章节信息
-//                    App.db.getChapterDao().getChapter(book.bookId, index)?.let { chapter ->
-//                        var it="   50年后，河坊街西泠社，我的思绪被一个老头子打断了，我合上我爷爷的笔记，打量了一下对方。\n" +
-//                                "    他皱起眉头，说到，“叫你小子平时多跟我学点东西，你就是不听，这东西明眼人一看就看出来了，这是张地图。”"
-//                        //处理内容
-//                        contentLoadFinish(book, chapter, it, upContent, resetPageOffset)
-//                        removeLoading(chapter.chapterIndex)
-//                        //通过章节信息找到对应内容
-//                        BookHelp.getContent(book, chapter)?.let {
-//                            //处理内容
-//                            contentLoadFinish(book, chapter, it, upContent, resetPageOffset)
-//                            removeLoading(chapter.chapterIndex)
-//                        } ?: download(chapter, resetPageOffset = resetPageOffset)
-//                    } ?: removeLoading(index)
             }.onError {
                 removeLoading(index)
             }
@@ -274,9 +262,7 @@ object ReadBook {
 //                    else -> chapter.chapterName
 //                }
                 val contents = BookHelp.disposeContent(
-                    book,
-                    chapter.chapterName,
-                    content
+                    book, chapter.chapterName, content
                 )
                 when (chapter.chapterIndex) {
                     //当前章节位置

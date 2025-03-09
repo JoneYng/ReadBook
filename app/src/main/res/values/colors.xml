@@ -6,9 +6,15 @@
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
+    <color name="black_50">#80000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="read_txt">#412903</color>
     <color name="read_bg">#ead0ae</color>
     <color name="background">#FAFAFA</color>
     <color name="btn_bg_press_2">#63858585</color>
+    <color name="purple_80">#63BB86FC</color>
+    <color name="background_menu">#EEEEEE</color>
+    <color name="bg_divider_line">#8fe0e0e0</color>
+    <color name="primaryText">#de000000</color>
+
 </resources>

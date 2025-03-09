@@ -3,7 +3,9 @@ package com.zx.read.ui
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.DashPathEffect
 import android.graphics.Paint
+import android.graphics.Path
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.util.Log
@@ -34,19 +36,22 @@ fun Context.getCompatColor(@ColorRes id: Int): Int = ContextCompat.getColor(this
  */
 class ContentTextView(context: Context, attrs: AttributeSet?) : View(context, attrs) {
     //是否开启选中
-    var selectAble = context.getPrefBoolean(PreferKey.textSelectAble,true)
+    var selectAble = context.getPrefBoolean(PreferKey.textSelectAble, true)
 
     //选中文字的画笔
     private val selectedPaint by lazy {
         Paint().apply {
-            color = context.getCompatColor(R.color.btn_bg_press_2)
+            color = context.getCompatColor(R.color.purple_80)
             style = Paint.Style.FILL
         }
     }
+
     //显示大小
     private val visibleRect = RectF()
+
     //选中开始位置
     private val selectStart = arrayOf(0, 0, 0)
+
     //选中结束位置
     private val selectEnd = arrayOf(0, 0, 0)
 
@@ -55,15 +60,18 @@ class ContentTextView(context: Context, attrs: AttributeSet?) : View(context, at
     private var callBack: CallBack
 
     var upView: ((TextPage) -> Unit)? = null
+
     //滚动参数
     private val pageFactory: TextPageFactory get() = callBack.pageFactory
+
     //页面偏移
     private var pageOffset = 0f
 
     init {
-       callBack = activity as CallBack
+        callBack = activity as CallBack
         contentDescription = textPage.text
     }
+
     fun setContent(textPage: TextPage) {
         this.textPage = textPage
         contentDescription = textPage.text
@@ -129,9 +137,7 @@ class ContentTextView(context: Context, attrs: AttributeSet?) : View(context, at
     }
 
     private fun draw(
-        canvas: Canvas,
-        textLine: TextLine,
-        relativeOffset: Float
+        canvas: Canvas, textLine: TextLine, relativeOffset: Float
     ) {
         val lineTop = textLine.lineTop + relativeOffset
         val lineBase = textLine.lineBase + relativeOffset
@@ -140,11 +146,7 @@ class ContentTextView(context: Context, attrs: AttributeSet?) : View(context, at
             drawImage(canvas, textLine, lineTop, lineBottom)
         } else {
             drawChars(
-                canvas,
-                lineTop,
-                lineBase,
-                lineBottom,
-                textLine
+                canvas, lineTop, lineBase, lineBottom, textLine
             )
         }
     }
@@ -158,45 +160,106 @@ class ContentTextView(context: Context, attrs: AttributeSet?) : View(context, at
      * @param textLine
      */
     private fun drawChars(
-        canvas: Canvas,
-        lineTop: Float,
-        lineBase: Float,
-        lineBottom: Float,
-        textLine: TextLine
+        canvas: Canvas, lineTop: Float, lineBase: Float, lineBottom: Float, textLine: TextLine
     ) {
-        val textPaint = if (textLine.isTitle) ChapterProvider.titlePaint else ChapterProvider.contentPaint
+        val textPaint =
+            if (textLine.isTitle) ChapterProvider.titlePaint else ChapterProvider.contentPaint
         textPaint.color =
             if (textLine.isReadAloud) ReadBookConfig.textColor else ReadBookConfig.textColor
-        textLine.textChars.forEach {
+
+        var selectionStartX = 0f //开始位置
+        var selectionEndX = 0f//结束位置
+        var baselineY = 0f
+        textLine.textChars.forEachIndexed { index, it ->
             canvas.drawText(it.charData, it.start, lineBase, textPaint)
             if (it.selected) {
                 canvas.drawRect(it.start, lineTop, it.end, lineBottom, selectedPaint)
             }
-            val paint = Paint().apply {
-                color = Color.RED
-                strokeWidth = 5f
-                isAntiAlias = true
+            baselineY = lineBottom
+        }
+        if(textLine.text.contains("资本主义的发展")){
+            //直线
+            drawLine(canvas, textLine.textChars.get(3).start, textLine.textChars.get(10).end, baselineY, LineType.STRAIGHT)
+            //直线-虚线
+            drawLine(canvas,textLine.textChars.get(12).start, textLine.textChars.get(20).end, baselineY, LineType.DASHED)
+            //曲线
+            drawLine(canvas, textLine.textChars.get(22).start, textLine.textChars.get(30).end, baselineY, LineType.WAVY)
+            //背景
+            canvas.drawRect(textLine.textChars.get(32).start, lineTop, textLine.textChars.get(40).end, baselineY, selectedPaint)
+        }
+
+    }
+
+
+    /**
+     * 在画布上绘制不同类型的线条
+     *
+     * @param canvas 画布对象
+     * @param startX 线条起始 X 坐标
+     * @param endX 线条结束 X 坐标
+     * @param y 线条的 Y 坐标
+     * @param type 线条类型（直线、虚线、波浪线）
+     * @param waveHeight 波浪线的高度（仅 `WAVY` 类型有效，默认 10f）
+     * @param waveLength 波浪线的宽度（仅 `WAVY` 类型有效，默认 20f）
+     */
+    private fun drawLine(
+        canvas: Canvas,
+        startX: Float,
+        endX: Float,
+        y: Float,
+        type: LineType,
+        waveHeight: Float = 10f,
+        waveLength: Float = 20f
+    ) {
+        /**
+         * 画笔设置（默认用于直线和波浪线）
+         */
+        val linePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = context.getColor(R.color.purple_200)
+            style = Paint.Style.STROKE
+            strokeWidth = 2f
+        }
+        when (type) {
+            // **绘制直线**
+            LineType.STRAIGHT -> {
+                canvas.drawLine(startX, y, endX, y, linePaint)
             }
-            // 画一条直线（手动绘制下划线）
-//            canvas.drawLine(it.start, lineBase + 10f, it.end, lineBase + 10f, paint)
-            // 绘制波浪线
-//            canvas.drawPath(path, paint)
+
+            // **绘制虚线**
+            LineType.DASHED -> {
+                val dashPaint = Paint(linePaint).apply {
+                    pathEffect = DashPathEffect(floatArrayOf(10f, 10f), 0f) // 10px 实线，10px 空白
+                }
+                canvas.drawLine(startX, y, endX, y, dashPaint)
+            }
+
+            // **绘制波浪线**
+            LineType.WAVY -> {
+                val path = Path()
+                path.moveTo(startX, y)
+                var x = startX
+                val adjustedEndX = endX - (endX - startX) % waveLength // 确保波浪完整
+                while (x < adjustedEndX) {
+                    val midX = x + waveLength / 2
+                    path.quadTo(midX, y + waveHeight, x + waveLength, y) // 画二阶贝塞尔曲线
+                    x += waveLength
+                }
+                canvas.drawPath(path, linePaint)
+            }
         }
     }
+
+
     /**
      * 绘制图片
      */
     private fun drawImage(
-        canvas: Canvas,
-        textLine: TextLine,
-        lineTop: Float,
-        lineBottom: Float
+        canvas: Canvas, textLine: TextLine, lineTop: Float, lineBottom: Float
     ) {
         textLine.textChars.forEach { textChar ->
             ReadBook.book?.let { book ->
                 val rectF = RectF(textChar.start, lineTop, textChar.end, lineBottom)
-                ImageProvider.getImage(book, textPage.chapterIndex, textChar.charData, true)
-                    ?.let {
+                ImageProvider.getImage(book, textPage.chapterIndex, textChar.charData, true)?.let {
                         canvas.drawBitmap(it, null, rectF, null)
                     }
             }
@@ -211,10 +274,7 @@ class ContentTextView(context: Context, attrs: AttributeSet?) : View(context, at
         pageOffset += mOffset
         if (!pageFactory.hasPrev() && pageOffset > 0) {
             pageOffset = 0f
-        } else if (!pageFactory.hasNext()
-            && pageOffset < 0
-            && pageOffset + textPage.height < ChapterProvider.visibleHeight
-        ) {
+        } else if (!pageFactory.hasNext() && pageOffset < 0 && pageOffset + textPage.height < ChapterProvider.visibleHeight) {
             val offset = ChapterProvider.visibleHeight - textPage.height
             pageOffset = min(0f, offset)
         } else if (pageOffset > 0) {
@@ -230,16 +290,16 @@ class ContentTextView(context: Context, attrs: AttributeSet?) : View(context, at
         }
         invalidate()
     }
+
     fun resetPageOffset() {
         pageOffset = 0f
     }
+
     /**
      * 选择文字
      */
     fun selectText(
-        x: Float,
-        y: Float,
-        select: (relativePage: Int, lineIndex: Int, charIndex: Int) -> Unit
+        x: Float, y: Float, select: (relativePage: Int, lineIndex: Int, charIndex: Int) -> Unit
     ) {
         if (!selectAble) return
         if (!visibleRect.contains(x, y)) return
@@ -278,7 +338,7 @@ class ContentTextView(context: Context, attrs: AttributeSet?) : View(context, at
     /**
      * 开始选择符移动
      */
-    fun selectStartMove(x: Float, y: Float) {
+    fun selectStartMove(x: Float, y: Float, startCursorOutOfBounds: () -> Unit) {
         if (!visibleRect.contains(x, y)) return
         var relativeOffset: Float
         for (relativePos in 0..2) {
@@ -293,10 +353,12 @@ class ContentTextView(context: Context, attrs: AttributeSet?) : View(context, at
                     for ((charIndex, textChar) in textLine.textChars.withIndex()) {
                         if (x > textChar.start && x < textChar.end) {
                             if (selectStart[0] != relativePos || selectStart[1] != lineIndex || selectStart[2] != charIndex) {
+                                //开始坐标大于结束坐标
                                 if (selectToInt(relativePos, lineIndex, charIndex) > selectToInt(
                                         selectEnd
                                     )
                                 ) {
+                                    startCursorOutOfBounds()
                                     return
                                 }
                                 selectStart[0] = relativePos
@@ -321,7 +383,7 @@ class ContentTextView(context: Context, attrs: AttributeSet?) : View(context, at
     /**
      * 结束选择符移动
      */
-    fun selectEndMove(x: Float, y: Float) {
+    fun selectEndMove(x: Float, y: Float, endCursorOutOfBounds: () -> Unit) {
         if (!visibleRect.contains(x, y)) return
         var relativeOffset: Float
         for (relativePos in 0..2) {
@@ -331,25 +393,27 @@ class ContentTextView(context: Context, attrs: AttributeSet?) : View(context, at
                 if (!callBack.isScroll) return
                 if (relativeOffset >= ChapterProvider.visibleHeight) return
             }
-            Log.e("y", "$y")
+
             for ((lineIndex, textLine) in relativePage(relativePos).textLines.withIndex()) {
                 if (y > textLine.lineTop + relativeOffset && y < textLine.lineBottom + relativeOffset) {
-                    Log.e("line", "$relativePos  $lineIndex")
                     for ((charIndex, textChar) in textLine.textChars.withIndex()) {
                         if (x > textChar.start && x < textChar.end) {
-                            Log.e("char", "$relativePos  $lineIndex $charIndex")
                             if (selectEnd[0] != relativePos || selectEnd[1] != lineIndex || selectEnd[2] != charIndex) {
+                                //结束坐标小于开始坐标
                                 if (selectToInt(relativePos, lineIndex, charIndex) < selectToInt(
                                         selectStart
                                     )
                                 ) {
-                                    return
+                                    endCursorOutOfBounds()
+                                } else {
+                                    selectEnd[0] = relativePos
+                                    selectEnd[1] = lineIndex
+                                    selectEnd[2] = charIndex
+                                    upSelectedEnd(
+                                        textChar.end, textLine.lineBottom + relativeOffset
+                                    )
+                                    upSelectChars()
                                 }
-                                selectEnd[0] = relativePos
-                                selectEnd[1] = lineIndex
-                                selectEnd[2] = charIndex
-                                upSelectedEnd(textChar.end, textLine.lineBottom + relativeOffset)
-                                upSelectChars()
                             }
                             return
                         }
@@ -396,11 +460,7 @@ class ContentTextView(context: Context, attrs: AttributeSet?) : View(context, at
             for ((lineIndex, textLine) in relativePage(relativePos).textLines.withIndex()) {
                 for ((charIndex, textChar) in textLine.textChars.withIndex()) {
                     textChar.selected =
-                        if (relativePos == selectStart[0]
-                            && relativePos == selectEnd[0]
-                            && lineIndex == selectStart[1]
-                            && lineIndex == selectEnd[1]
-                        ) {
+                        if (relativePos == selectStart[0] && relativePos == selectEnd[0] && lineIndex == selectStart[1] && lineIndex == selectEnd[1]) {
                             charIndex in selectStart[2]..selectEnd[2]
                         } else if (relativePos == selectStart[0] && lineIndex == selectStart[1]) {
                             charIndex >= selectStart[2]
@@ -452,8 +512,7 @@ class ContentTextView(context: Context, attrs: AttributeSet?) : View(context, at
                         if (lineIndex == selectStart[1] && lineIndex == selectEnd[1]) {
                             stringBuilder.append(
                                 textPage.textLines[lineIndex].text.substring(
-                                    selectStart[2],
-                                    selectEnd[2] + 1
+                                    selectStart[2], selectEnd[2] + 1
                                 )
                             )
                         } else if (lineIndex == selectStart[1]) {
@@ -517,6 +576,7 @@ class ContentTextView(context: Context, attrs: AttributeSet?) : View(context, at
             else -> pageOffset + textPage.height + pageFactory.nextPage.height
         }
     }
+
     //相对页面
     private fun relativePage(relativePos: Int): TextPage {
         return when (relativePos) {
@@ -525,6 +585,7 @@ class ContentTextView(context: Context, attrs: AttributeSet?) : View(context, at
             else -> pageFactory.nextPagePlus
         }
     }
+
 
     interface CallBack {
         fun upSelectedStart(x: Float, y: Float, top: Float)
@@ -536,4 +597,13 @@ class ContentTextView(context: Context, attrs: AttributeSet?) : View(context, at
         val isScroll: Boolean
     }
 
+}
+
+/**
+ * 线条类型枚举
+ */
+enum class LineType {
+    STRAIGHT, // 直线
+    DASHED,   // 虚线
+    WAVY      // 波浪线
 }

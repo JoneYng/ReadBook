@@ -50,12 +50,6 @@ class ContentView(context: Context) : FrameLayout(context) {
             tvFooterRight.typeface = ChapterProvider.typeface
             tvFooterRight.setColor(textColor)
             upStatusBar()
-            llFooter.setPadding(
-                footerPaddingLeft.dp,
-                footerPaddingTop.dp,
-                footerPaddingRight.dp,
-                footerPaddingBottom.dp
-            )
             vwTopDivider.visible(showHeaderLine)
             vwBottomDivider.visible(showFooterLine)
             binding.contentTextView.upVisibleRect()
@@ -122,16 +116,16 @@ class ContentView(context: Context) : FrameLayout(context) {
         return binding.contentTextView.selectText(x, y - headerHeight, select)
     }
 
-    fun selectStartMove(x: Float, y: Float) {
-        binding.contentTextView.selectStartMove(x, y - headerHeight)
+    fun selectStartMove(x: Float, y: Float,startCursorOutOfBounds: () -> Unit) {
+        binding.contentTextView.selectStartMove(x, y - headerHeight,startCursorOutOfBounds)
     }
 
     fun selectStartMoveIndex(relativePage: Int, lineIndex: Int, charIndex: Int) {
         binding.contentTextView.selectStartMoveIndex(relativePage, lineIndex, charIndex)
     }
 
-    fun selectEndMove(x: Float, y: Float) {
-        binding.contentTextView.selectEndMove(x, y - headerHeight)
+    fun selectEndMove(x: Float, y: Float,endCursorOutOfBounds:()->Unit) {
+        binding.contentTextView.selectEndMove(x, y - headerHeight,endCursorOutOfBounds)
     }
 
     fun selectEndMoveIndex(relativePage: Int, lineIndex: Int, charIndex: Int) {

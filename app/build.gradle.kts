@@ -69,8 +69,9 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-
+    //anko
     implementation("org.jetbrains.anko:anko-sdk27:0.10.8")
+    implementation("org.jetbrains.anko:anko-sdk27-listeners:0.10.8")
     implementation("com.google.code.gson:gson:2.8.6")
     implementation("com.google.android.material:material:1.11.0")
 }

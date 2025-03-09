@@ -260,8 +260,24 @@ object ChapterProvider {
         }
         return durY + paragraphSpacing / 10f
     }
+
+
+    // 扩展函数：条件追加字符串
+    private fun StringBuilder.appendIf(condition: Boolean, text: String) {
+        if (condition) append(text)
+    }
+
     /**
-     * 排版文字
+     * 排版文本内容到指定页面，支持标题与正文的不同格式处理，自动分页
+     *
+     * @param text 需要排版的原始文本内容
+     * @param y 起始Y轴坐标（基于当前页面坐标系）
+     * @param textPages 页面数据集合（会被修改）
+     * @param pageLines 记录每页行数的集合（会被修改）
+     * @param pageLengths 记录每页字符数的集合（会被修改）
+     * @param stringBuilder 用于累积当前页文本内容的缓冲区
+     * @param isTitle 是否为标题文本（影响排版样式）
+     * @return 排版完成后的最新Y轴坐标
      */
     private fun setTypeText(
         text: String,
@@ -272,19 +288,31 @@ object ChapterProvider {
         stringBuilder: StringBuilder,
         isTitle: Boolean,
     ): Float {
+        // 初始化垂直起始位置（标题增加顶部间距）
         var durY = if (isTitle) y + titleTopSpacing else y
+        // 根据文本类型选择画笔
         val textPaint = if (isTitle) titlePaint else contentPaint
+        // 创建静态布局处理自动换行（可见区域宽度作为最大行宽)
         val layout = StaticLayout(
-            text, textPaint, visibleWidth, Layout.Alignment.ALIGN_NORMAL, 0f, 0f, true
+            text, textPaint, visibleWidth,
+            Layout.Alignment.ALIGN_NORMAL,  // 左对齐
+            0f, // 行间距倍数（不使用）
+             0f,// 行间距加值（不使用）
+            true// 包含内边距
         )
+//        // 新增底部间距参数（建议通过资源配置）
+//        val bottomMargin = 24f // 单位：像素
+//        // 计算实际可用高度
+//        val availableHeight = visibleHeight - bottomMargin
+        // 逐行处理排版逻辑
         for (lineIndex in 0 until layout.lineCount) {
             val textLine = TextLine(isTitle = isTitle)
             val words =
                 text.substring(layout.getLineStart(lineIndex), layout.getLineEnd(lineIndex))
             val desiredWidth = layout.getLineWidth(lineIndex)
             var isLastLine = false
+            // 处理首行特殊情况（非标题且多行时）
             if (lineIndex == 0 && layout.lineCount > 1 && !isTitle) {
-                //第一行
                 textLine.text = words
                 addCharsToLineFirst(
                     textLine,
@@ -292,10 +320,12 @@ object ChapterProvider {
                     textPaint,
                     desiredWidth
                 )
-            } else if (lineIndex == layout.lineCount - 1) {
-                //最后一行
+            }
+            // 处理末行（添加换行符）
+            else if (lineIndex == layout.lineCount - 1) {
                 textLine.text = "$words\n"
                 isLastLine = true
+                // 标题居中处理
                 val x = if (isTitle && ReadBookConfig.titleMode == 1)
                     (visibleWidth - layout.getLineWidth(lineIndex)) / 2
                 else 0f
@@ -305,39 +335,55 @@ object ChapterProvider {
                     textPaint,
                     x
                 )
-            } else {
-                //中间行
+            }
+            // 普通中间行处理
+            else {
                 textLine.text = words
                 addCharsToLineMiddle(
                     textLine,
                     words.toStringArray(),
                     textPaint,
                     desiredWidth,
-                    0f
+                    0f// 首行缩进值
                 )
             }
+
+
+            // 分页检测：当内容超出可视区域高度时
             if (durY + textPaint.textHeight > visibleHeight) {
-                //当前页面结束,设置各种值
+                // 完成当前页设置
                 textPages.last().text = stringBuilder.toString()
+                // 记录行数
                 pageLines.add(textPages.last().textLines.size)
+                // 记录字符数
                 pageLengths.add(textPages.last().text.length)
                 textPages.last().height = durY
-                //新建页面
+                // 创建新页面并重置状态
                 textPages.add(TextPage())
                 stringBuilder.clear()
+                // 新页Y轴归零
                 durY = 0f
             }
+            // 累积当前行内容
             stringBuilder.append(words)
+            // 末行添加换行
             if (isLastLine) stringBuilder.append("\n")
+            // 更新页面数据
             textPages.last().textLines.add(textLine)
+            // 设置行位置
             textLine.upTopBottom(durY, textPaint)
+            // 更新垂直坐标（考虑行间距系数）
             durY += textPaint.textHeight * lineSpacingExtra / 10f
+            // 记录当前页高度
             textPages.last().height = durY
         }
+        // 添加段落间距（标题额外增加底部间距）
         if (isTitle) durY += titleBottomSpacing
         durY += textPaint.textHeight * paragraphSpacing / 10f
+
         return durY
     }
+
     /**
      * 有缩进,两端对齐
      */
@@ -476,7 +522,8 @@ object ChapterProvider {
             paddingLeft = ReadBookConfig.paddingLeft.dp
             paddingTop = ReadBookConfig.paddingTop.dp
             visibleWidth = viewWidth - paddingLeft - ReadBookConfig.paddingRight.dp
-            visibleHeight = viewHeight - paddingTop - ReadBookConfig.paddingBottom.dp
+            visibleHeight = viewHeight - paddingTop
+//            visibleHeight = viewHeight - paddingTop - ReadBookConfig.paddingBottom.dp
             visibleRight = paddingLeft + visibleWidth
             visibleBottom = paddingTop + visibleHeight
         }

@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/root_view"
+        android:background="@color/background"
+        android:orientation="vertical">
+
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="205dp"
+            android:paddingTop="8dp"
+            android:background="@color/background">
+
+            <View
+                android:id="@+id/vw_bg"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_gravity="center"
+                    android:orientation="horizontal"
+                    android:paddingLeft="15dp"
+                    android:paddingTop="5dp"
+                    android:paddingRight="15dp"
+                    android:paddingBottom="10dp">
+
+                    <TextView
+                        android:id="@+id/nbTextSizeDec"
+                        android:layout_width="0dp"
+                        android:layout_height="36dp"
+                        android:layout_gravity="center"
+                        android:layout_weight="3.5"
+                        android:gravity="center"
+                        android:textStyle="bold"
+                        android:text="A-"
+                        android:textSize="14sp"
+                        android:textColor="@color/black"
+                       />
+
+                    <TextView
+                        android:id="@+id/nbTextSize"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:gravity="center_vertical"
+                        android:paddingLeft="4dp"
+                        android:paddingRight="4dp"
+                        android:text="20"
+                        android:textColor="@color/black"
+                        />
+
+                    <TextView
+                        android:id="@+id/nbTextSizeAdd"
+                        android:layout_width="0dp"
+                        android:layout_height="36dp"
+                        android:layout_gravity="center"
+                        android:layout_weight="3.5"
+                        android:gravity="center"
+                        android:textStyle="bold"
+                        android:text="A+"
+                        android:textSize="14sp"
+                        android:textColor="@color/black"
+
+                        />
+
+                    <Space
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.5" />
+
+                    <TextView
+                        android:id="@+id/fl_text_Bold"
+                        android:layout_width="0dp"
+                        android:layout_height="36dp"
+                        android:layout_gravity="center"
+                        android:layout_weight="4"
+                        android:gravity="center"
+                        android:text="正常"
+                        android:textSize="14sp"
+                        android:visibility="gone"
+                        android:textColor="@color/black"
+                        />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.8dp"
+                    android:background="@color/bg_divider_line" />
+
+                <RadioGroup
+                    android:id="@+id/rg_page_anim"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:orientation="horizontal"
+                    android:gravity="center">
+
+                    <RadioButton
+                        android:id="@+id/rb_anim0"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_margin="5dp"
+                        android:padding="5dp"
+                        android:gravity="center"
+                        android:singleLine="true"
+                        android:text="覆蓋"
+                        android:button="@null"
+                        android:checked="true"
+                        android:textColor="@drawable/radio_text_selector"
+                        />
+
+                    <RadioButton
+                        android:id="@+id/rb_anim1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_margin="5dp"
+                        android:padding="5dp"
+                        android:gravity="center"
+                        android:singleLine="true"
+                        android:button="@null"
+                        android:textColor="@drawable/radio_text_selector"
+                        android:text="滑动"
+                        />
+
+                    <RadioButton
+                        android:id="@+id/rb_simulation_anim"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_margin="5dp"
+                        android:padding="5dp"
+                        android:gravity="center"
+                        android:singleLine="true"
+                        android:button="@null"
+                        android:text="仿真"
+                        android:textColor="@drawable/radio_text_selector"
+                        />
+
+                    <RadioButton
+                        android:id="@+id/rb_scroll_anim"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_margin="5dp"
+                        android:padding="5dp"
+                        android:button="@null"
+                        android:gravity="center"
+                        android:singleLine="true"
+                        android:text="滚动"
+                        android:textColor="@drawable/radio_text_selector"
+                        />
+
+                    <RadioButton
+                        android:id="@+id/rb_no_anim"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_margin="5dp"
+                        android:padding="5dp"
+                        android:button="@null"
+                        android:gravity="center"
+                        android:singleLine="true"
+                        android:text="无动画"
+                        android:textColor="@drawable/radio_text_selector"
+                        />
+
+                </RadioGroup>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.8dp"
+                    android:background="@color/bg_divider_line" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_style"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingTop="12dp"
+                    android:paddingHorizontal="10dp"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:listitem="@layout/item_read_style" />
+
+            </LinearLayout>
+
+        </FrameLayout>
+    </LinearLayout>
+</layout>

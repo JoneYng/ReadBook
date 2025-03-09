@@ -237,7 +237,6 @@ object ReadBookConfig {
 
     var paddingBottom: Int
         get() = config.paddingBottom
-        //        get() = 20
         set(value) {
             config.paddingBottom = value
         }
@@ -260,54 +259,6 @@ object ReadBookConfig {
             config.paddingTop = value
         }
 
-    var headerPaddingBottom: Int
-        get() = config.headerPaddingBottom
-        set(value) {
-            config.headerPaddingBottom = value
-        }
-
-    var headerPaddingLeft: Int
-        get() = config.headerPaddingLeft
-        set(value) {
-            config.headerPaddingLeft = value
-        }
-
-    var headerPaddingRight: Int
-        get() = config.headerPaddingRight
-        set(value) {
-            config.headerPaddingRight = value
-        }
-
-    var headerPaddingTop: Int
-        get() = config.headerPaddingTop
-        set(value) {
-            config.headerPaddingTop = value
-        }
-
-    var footerPaddingBottom: Int
-        //        get() = config.footerPaddingBottom
-        get() = 10
-        set(value) {
-            config.footerPaddingBottom = value
-        }
-
-    var footerPaddingLeft: Int
-        get() = config.footerPaddingLeft
-        set(value) {
-            config.footerPaddingLeft = value
-        }
-
-    var footerPaddingRight: Int
-        get() = config.footerPaddingRight
-        set(value) {
-            config.footerPaddingRight = value
-        }
-
-    var footerPaddingTop: Int
-        get() = config.footerPaddingTop
-        set(value) {
-            config.footerPaddingTop = value
-        }
 
     var showHeaderLine: Boolean
         get() = config.showHeaderLine
@@ -338,14 +289,8 @@ object ReadBookConfig {
             exportConfig.paddingLeft = shareConfig.paddingLeft
             exportConfig.paddingRight = shareConfig.paddingRight
             exportConfig.paddingTop = shareConfig.paddingTop
-            exportConfig.headerPaddingBottom = shareConfig.headerPaddingBottom
-            exportConfig.headerPaddingLeft = shareConfig.headerPaddingLeft
-            exportConfig.headerPaddingRight = shareConfig.headerPaddingRight
-            exportConfig.headerPaddingTop = shareConfig.headerPaddingTop
-            exportConfig.footerPaddingBottom = shareConfig.footerPaddingBottom
-            exportConfig.footerPaddingLeft = shareConfig.footerPaddingLeft
-            exportConfig.footerPaddingRight = shareConfig.footerPaddingRight
-            exportConfig.footerPaddingTop = shareConfig.footerPaddingTop
+
+
             exportConfig.showHeaderLine = shareConfig.showHeaderLine
             exportConfig.showFooterLine = shareConfig.showFooterLine
             exportConfig.tipHeaderLeft = shareConfig.tipHeaderLeft
@@ -388,18 +333,11 @@ object ReadBookConfig {
         var titleTopSpacing: Int = 12,
         var titleBottomSpacing: Int = 0,
         var paragraphIndent: String = "　　",//段落缩进
-        var paddingBottom: Int = 6,
+        var paddingBottom: Int = 16,
         var paddingLeft: Int = 16,
         var paddingRight: Int = 16,
         var paddingTop: Int = 10,
-        var headerPaddingBottom: Int = 0,
-        var headerPaddingLeft: Int = 16,
-        var headerPaddingRight: Int = 16,
-        var headerPaddingTop: Int = 0,
-        var footerPaddingBottom: Int = 60,
-        var footerPaddingLeft: Int = 16,
-        var footerPaddingRight: Int = 16,
-        var footerPaddingTop: Int = 6,
+
         var showHeaderLine: Boolean = false,
         var showFooterLine: Boolean = false,
         var tipHeaderLeft: Int = ReadTipConfig.time,
