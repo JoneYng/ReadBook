@@ -18,14 +18,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-
-        <View
-            android:id="@+id/vw_top_divider"
-            android:layout_width="match_parent"
-            android:layout_height="0.5dp"
-            android:background="@color/black"
-            android:visibility="invisible" />
-
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -37,14 +29,6 @@
                 android:layout_height="match_parent" />
 
         </FrameLayout>
-
-
-        <View
-            android:id="@+id/vw_bottom_divider"
-            android:layout_width="match_parent"
-            android:layout_height="0.5dp"
-            android:background="@color/black"
-            android:visibility="invisible" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/ll_footer"

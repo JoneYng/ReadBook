@@ -178,14 +178,14 @@ class ContentTextView(context: Context, attrs: AttributeSet?) : View(context, at
             baselineY = lineBottom
         }
         if(textLine.text.contains("资本主义的发展")){
-            //直线
-            drawLine(canvas, textLine.textChars.get(3).start, textLine.textChars.get(10).end, baselineY, LineType.STRAIGHT)
-            //直线-虚线
-            drawLine(canvas,textLine.textChars.get(12).start, textLine.textChars.get(20).end, baselineY, LineType.DASHED)
-            //曲线
-            drawLine(canvas, textLine.textChars.get(22).start, textLine.textChars.get(30).end, baselineY, LineType.WAVY)
-            //背景
-            canvas.drawRect(textLine.textChars.get(32).start, lineTop, textLine.textChars.get(40).end, baselineY, selectedPaint)
+//            //直线
+//            drawLine(canvas, textLine.textChars.get(3).start, textLine.textChars.get(10).end, baselineY, LineType.STRAIGHT)
+//            //直线-虚线
+//            drawLine(canvas,textLine.textChars.get(12).start, textLine.textChars.get(20).end, baselineY, LineType.DASHED)
+//            //曲线
+//            drawLine(canvas, textLine.textChars.get(22).start, textLine.textChars.get(30).end, baselineY, LineType.WAVY)
+//            //背景
+//            canvas.drawRect(textLine.textChars.get(32).start, lineTop, textLine.textChars.get(40).end, baselineY, selectedPaint)
         }
 
     }

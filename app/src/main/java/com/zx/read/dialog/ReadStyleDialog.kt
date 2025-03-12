@@ -2,7 +2,11 @@ package com.zx.read.dialog
 
 import android.content.DialogInterface
 import android.os.Bundle
-import android.view.*
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.WindowManager
 import androidx.core.view.get
 import com.zx.read.BaseDialogFragment
 import com.zx.read.ReadActivity
@@ -12,11 +16,7 @@ import com.zx.read.extensions.getIndexById
 import com.zx.read.extensions.viewBinding
 import com.zx.readbook.R
 import com.zx.readbook.databinding.DialogReadBookStyleBinding
-import com.zx.readbook.databinding.ItemReadStyleBinding
-
 import org.jetbrains.anko.sdk27.listeners.onCheckedChange
-import org.jetbrains.anko.sdk27.listeners.onClick
-import org.jetbrains.anko.sdk27.listeners.onLongClick
 
 class ReadStyleDialog(var upConfig: () -> Unit) : BaseDialogFragment() {
     private val binding by viewBinding(DialogReadBookStyleBinding::bind)
@@ -68,23 +68,31 @@ class ReadStyleDialog(var upConfig: () -> Unit) : BaseDialogFragment() {
 //        flTextBold.onChanged {
 //            postEvent(EventBus.UP_CONFIG, true)
 //        }
-
         rgPageAnim.onCheckedChange { _, checkedId ->
             ReadBookConfig.pageAnim = -1
             ReadBookConfig.pageAnim = binding.rgPageAnim.getIndexById(checkedId)
             callBack?.upPageAnim()
         }
+        sliderTextSize.onValueChanged={
+            sliderTextSize.setThumbText(it.toInt().toString())
+            ReadBookConfig.textSize = it.toInt()
+            upConfig()
+        }
 
-        nbTextSizeAdd.setOnClickListener {
-            ReadBookConfig.textSize = ReadBookConfig.textSize + 2
+        sliderLineSpacing.onValueChanged={
+            ReadBookConfig.lineSpacingExtra = it.toInt()
             upConfig()
-            nbTextSize.text = ReadBookConfig.textSize.toString()
         }
-        nbTextSizeDec.setOnClickListener {
-            ReadBookConfig.textSize = ReadBookConfig.textSize - 2
+
+        sliderBookPadding.onValueChanged={
+            ReadBookConfig.paddingTop = it.toInt()
+            ReadBookConfig.paddingLeft = it.toInt()
+            ReadBookConfig.paddingRight = it.toInt()
+            ReadBookConfig.paddingBottom = it.toInt()
             upConfig()
-            nbTextSize.text = ReadBookConfig.textSize.toString()
         }
+
+
     }
 
 

@@ -260,18 +260,6 @@ object ReadBookConfig {
         }
 
 
-    var showHeaderLine: Boolean
-        get() = config.showHeaderLine
-        set(value) {
-            config.showHeaderLine = value
-        }
-
-    var showFooterLine: Boolean
-        get() = config.showFooterLine
-        set(value) {
-            config.showFooterLine = value
-        }
-
     fun getExportConfig(): Config {
         val exportConfig = GSON.fromJsonObject<Config>(GSON.toJson(durConfig))!!
         if (shareLayout) {
@@ -289,18 +277,6 @@ object ReadBookConfig {
             exportConfig.paddingLeft = shareConfig.paddingLeft
             exportConfig.paddingRight = shareConfig.paddingRight
             exportConfig.paddingTop = shareConfig.paddingTop
-
-
-            exportConfig.showHeaderLine = shareConfig.showHeaderLine
-            exportConfig.showFooterLine = shareConfig.showFooterLine
-            exportConfig.tipHeaderLeft = shareConfig.tipHeaderLeft
-            exportConfig.tipHeaderMiddle = shareConfig.tipHeaderMiddle
-            exportConfig.tipHeaderRight = shareConfig.tipHeaderRight
-            exportConfig.tipFooterLeft = shareConfig.tipFooterLeft
-            exportConfig.tipFooterMiddle = shareConfig.tipFooterMiddle
-            exportConfig.tipFooterRight = shareConfig.tipFooterRight
-            exportConfig.hideHeader = shareConfig.hideHeader
-            exportConfig.hideFooter = shareConfig.hideFooter
         }
         return exportConfig
     }
@@ -328,26 +304,16 @@ object ReadBookConfig {
         var letterSpacing: Float = 0.1f,//字间距
         var lineSpacingExtra: Int = 13,//行间距
         var paragraphSpacing: Int = 4,//段距
-        var titleMode: Int = 0,//标题居中 1 居中
-        var titleSize: Int = 5,
-        var titleTopSpacing: Int = 12,
-        var titleBottomSpacing: Int = 0,
+        var titleMode: Int = 2,//标题居中 0 居左 ，1 居中 ，2不显示
+        var titleSize: Int = 5,//标题大小
+        var titleTopSpacing: Int = 0, //标题顶部间距
+        var titleBottomSpacing: Int = 0,//标题底部间距
         var paragraphIndent: String = "　　",//段落缩进
-        var paddingBottom: Int = 16,
-        var paddingLeft: Int = 16,
-        var paddingRight: Int = 16,
-        var paddingTop: Int = 10,
+        var paddingBottom: Int = 16,//页面边距底部
+        var paddingLeft: Int = 16,//页面边距左边
+        var paddingRight: Int = 16,//页面边距右边
+        var paddingTop: Int = 10,//页面边距顶部
 
-        var showHeaderLine: Boolean = false,
-        var showFooterLine: Boolean = false,
-        var tipHeaderLeft: Int = ReadTipConfig.time,
-        var tipHeaderMiddle: Int = ReadTipConfig.none,
-        var tipHeaderRight: Int = ReadTipConfig.battery,
-        var tipFooterLeft: Int = ReadTipConfig.chapterTitle,
-        var tipFooterMiddle: Int = ReadTipConfig.none,
-        var tipFooterRight: Int = ReadTipConfig.pageAndTotal,
-        var hideHeader: Boolean = true,
-        var hideFooter: Boolean = false
     ) {
 
         fun setCurTextColor(color: Int) {

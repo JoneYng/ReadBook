@@ -7,202 +7,197 @@
 
     </data>
 
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/root_view"
         android:background="@color/background"
         android:orientation="vertical">
 
-
-        <FrameLayout
+        <com.zx.read.ui.CustomSliderView
+            android:id="@+id/slider_text_size"
             android:layout_width="match_parent"
-            android:layout_height="205dp"
-            android:paddingTop="8dp"
-            android:background="@color/background">
+            android:layout_height="55dp"
+            app:currentValue="22"
+            app:endText="A"
+            app:maxValue="40"
+            app:minValue="16"
+            app:progressColor="#ECECEE"
+            app:startText="A"
+            app:thumbColor="#FFFFFF"
+            app:thumbText="22"
+            app:trackColor="#F8F8F8"
+            app:trackHeight="40dp"
+            android:layout_margin="20dp"/>
 
-            <View
-                android:id="@+id/vw_bg"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+            <com.zx.read.ui.CustomSliderView
+                android:id="@+id/slider_book_padding"
+                android:layout_width="0dp"
+                android:layout_height="55dp"
+                android:layout_marginEnd="10dp"
+                android:layout_weight="1"
+                app:currentValue="16"
+                app:endText="大"
+                app:maxValue="30"
+                app:minValue="10"
+                app:progressColor="#ECECEE"
+                app:startText="小"
+                app:thumbColor="#FFFFFF"
+                app:thumbText="边距"
+                app:trackColor="#F8F8F8"
+                app:trackHeight="40dp" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:layout_gravity="center"
-                    android:orientation="horizontal"
-                    android:paddingLeft="15dp"
-                    android:paddingTop="5dp"
-                    android:paddingRight="15dp"
-                    android:paddingBottom="10dp">
+            <com.zx.read.ui.CustomSliderView
+                android:id="@+id/slider_line_spacing"
+                android:layout_width="0dp"
+                android:layout_height="55dp"
+                android:layout_marginStart="10dp"
+                android:layout_weight="1"
+                app:currentValue="13"
+                app:endText="松"
+                app:maxValue="20"
+                app:minValue="10"
+                app:progressColor="#ECECEE"
+                app:startText="紧"
+                app:thumbColor="#FFFFFF"
+                app:thumbText="行距"
+                app:trackColor="#F8F8F8"
+                app:trackHeight="40dp" />
+        </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/nbTextSizeDec"
-                        android:layout_width="0dp"
-                        android:layout_height="36dp"
-                        android:layout_gravity="center"
-                        android:layout_weight="3.5"
-                        android:gravity="center"
-                        android:textStyle="bold"
-                        android:text="A-"
-                        android:textSize="14sp"
-                        android:textColor="@color/black"
-                       />
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5" />
 
-                    <TextView
-                        android:id="@+id/nbTextSize"
-                        android:layout_width="wrap_content"
-                        android:layout_height="36dp"
-                        android:gravity="center_vertical"
-                        android:paddingLeft="4dp"
-                        android:paddingRight="4dp"
-                        android:text="20"
-                        android:textColor="@color/black"
-                        />
+        <TextView
+            android:id="@+id/fl_text_Bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="正常"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            android:visibility="gone" />
 
-                    <TextView
-                        android:id="@+id/nbTextSizeAdd"
-                        android:layout_width="0dp"
-                        android:layout_height="36dp"
-                        android:layout_gravity="center"
-                        android:layout_weight="3.5"
-                        android:gravity="center"
-                        android:textStyle="bold"
-                        android:text="A+"
-                        android:textSize="14sp"
-                        android:textColor="@color/black"
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.8dp"
+            android:background="@color/bg_divider_line" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:text="翻页方式"
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            android:layout_margin="20dp"
 
-                        />
+            />
+        <RadioGroup
+            android:id="@+id/rg_page_anim"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp">
 
-                    <Space
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="0.5" />
+            <RadioButton
+                android:id="@+id/rb_anim0"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:button="@null"
+                android:checked="true"
+                android:gravity="center"
+                android:padding="5dp"
+                android:singleLine="true"
+                android:text="覆蓋"
+                android:textSize="16sp"
+                android:textColor="@drawable/radio_text_selector" />
 
-                    <TextView
-                        android:id="@+id/fl_text_Bold"
-                        android:layout_width="0dp"
-                        android:layout_height="36dp"
-                        android:layout_gravity="center"
-                        android:layout_weight="4"
-                        android:gravity="center"
-                        android:text="正常"
-                        android:textSize="14sp"
-                        android:visibility="gone"
-                        android:textColor="@color/black"
-                        />
+            <RadioButton
+                android:id="@+id/rb_anim1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:button="@null"
+                android:gravity="center"
+                android:padding="5dp"
+                android:singleLine="true"
+                android:text="滑动"
+                android:textSize="16sp"
+                android:textColor="@drawable/radio_text_selector" />
 
-                </LinearLayout>
+            <RadioButton
+                android:id="@+id/rb_simulation_anim"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:button="@null"
+                android:gravity="center"
+                android:padding="5dp"
+                android:singleLine="true"
+                android:text="仿真"
+                android:textSize="16sp"
+                android:textColor="@drawable/radio_text_selector" />
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="0.8dp"
-                    android:background="@color/bg_divider_line" />
+            <RadioButton
+                android:id="@+id/rb_scroll_anim"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:button="@null"
+                android:gravity="center"
+                android:padding="5dp"
+                android:singleLine="true"
+                android:text="滚动"
+                android:textSize="16sp"
+                android:textColor="@drawable/radio_text_selector" />
 
-                <RadioGroup
-                    android:id="@+id/rg_page_anim"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:orientation="horizontal"
-                    android:gravity="center">
+            <RadioButton
+                android:id="@+id/rb_no_anim"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:button="@null"
+                android:gravity="center"
+                android:padding="5dp"
+                android:singleLine="true"
+                android:text="无动画"
+                android:textSize="16sp"
+                android:textColor="@drawable/radio_text_selector" />
 
-                    <RadioButton
-                        android:id="@+id/rb_anim0"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_margin="5dp"
-                        android:padding="5dp"
-                        android:gravity="center"
-                        android:singleLine="true"
-                        android:text="覆蓋"
-                        android:button="@null"
-                        android:checked="true"
-                        android:textColor="@drawable/radio_text_selector"
-                        />
+        </RadioGroup>
 
-                    <RadioButton
-                        android:id="@+id/rb_anim1"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_margin="5dp"
-                        android:padding="5dp"
-                        android:gravity="center"
-                        android:singleLine="true"
-                        android:button="@null"
-                        android:textColor="@drawable/radio_text_selector"
-                        android:text="滑动"
-                        />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.8dp"
+            android:background="@color/bg_divider_line" />
 
-                    <RadioButton
-                        android:id="@+id/rb_simulation_anim"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_margin="5dp"
-                        android:padding="5dp"
-                        android:gravity="center"
-                        android:singleLine="true"
-                        android:button="@null"
-                        android:text="仿真"
-                        android:textColor="@drawable/radio_text_selector"
-                        />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_style"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingHorizontal="10dp"
+            android:paddingTop="12dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_read_style" />
 
-                    <RadioButton
-                        android:id="@+id/rb_scroll_anim"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_margin="5dp"
-                        android:padding="5dp"
-                        android:button="@null"
-                        android:gravity="center"
-                        android:singleLine="true"
-                        android:text="滚动"
-                        android:textColor="@drawable/radio_text_selector"
-                        />
-
-                    <RadioButton
-                        android:id="@+id/rb_no_anim"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_margin="5dp"
-                        android:padding="5dp"
-                        android:button="@null"
-                        android:gravity="center"
-                        android:singleLine="true"
-                        android:text="无动画"
-                        android:textColor="@drawable/radio_text_selector"
-                        />
-
-                </RadioGroup>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="0.8dp"
-                    android:background="@color/bg_divider_line" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rv_style"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingTop="12dp"
-                    android:paddingHorizontal="10dp"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    tools:listitem="@layout/item_read_style" />
-
-            </LinearLayout>
-
-        </FrameLayout>
     </LinearLayout>
+
 </layout>

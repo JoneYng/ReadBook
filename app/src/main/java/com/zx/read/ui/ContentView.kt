@@ -8,10 +8,7 @@ import android.widget.FrameLayout
 import androidx.core.view.isGone
 import com.zx.read.bean.TextPage
 import com.zx.read.config.ReadBookConfig
-import com.zx.read.config.ReadTipConfig
-import com.zx.read.extensions.dp
 import com.zx.read.extensions.statusBarHeight
-import com.zx.read.extensions.visible
 import com.zx.read.provider.ChapterProvider
 import com.zx.readbook.R
 import com.zx.readbook.databinding.ViewBookPageBinding
@@ -50,8 +47,6 @@ class ContentView(context: Context) : FrameLayout(context) {
             tvFooterRight.typeface = ChapterProvider.typeface
             tvFooterRight.setColor(textColor)
             upStatusBar()
-            vwTopDivider.visible(showHeaderLine)
-            vwBottomDivider.visible(showFooterLine)
             binding.contentTextView.upVisibleRect()
         }
     }
@@ -66,14 +61,7 @@ class ContentView(context: Context) : FrameLayout(context) {
     }
 
     fun upTipStyle()  = with(binding) {
-        ReadTipConfig.apply {
-            tvFooterRight.isGone = tipFooterRight == none
-            llFooter.isGone = hideFooter
-        }
-        tvPageAndTotal = when (ReadTipConfig.pageAndTotal) {
-            ReadTipConfig.tipFooterRight -> tvFooterRight
-            else -> null
-        }
+        tvPageAndTotal =tvFooterRight
         tvPageAndTotal?.apply {
             isBattery = false
             textSize = 12f

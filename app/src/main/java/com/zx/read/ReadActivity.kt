@@ -19,6 +19,7 @@ import com.zx.read.extensions.statusBarHeight
 import com.zx.read.extensions.visible
 import com.zx.read.factory.TextPageFactory
 import com.zx.read.ui.ContentTextView
+import com.zx.read.ui.CustomSliderView
 import com.zx.read.ui.PageView
 import com.zx.read.ui.ReadMenu
 import com.zx.readbook.R
@@ -98,6 +99,7 @@ class ReadActivity : AppCompatActivity(), View.OnTouchListener, PageView.CallBac
         cursorLeft = findViewById<ImageView>(R.id.cursor_left)
         cursorRight = findViewById<ImageView>(R.id.cursor_right)
         readMenu = findViewById<ReadMenu>(R.id.read_menu)
+
         ReadBook.callBack = this
         initView()
         ReadBook.loadContent(resetPageOffset = true)
