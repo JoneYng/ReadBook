@@ -28,20 +28,20 @@
             app:thumbText="22"
             app:trackColor="#F8F8F8"
             app:trackHeight="40dp"
-            android:layout_margin="20dp"/>
+            android:layout_margin="10dp"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp">
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp">
 
             <com.zx.read.ui.CustomSliderView
                 android:id="@+id/slider_book_padding"
                 android:layout_width="0dp"
                 android:layout_height="55dp"
-                android:layout_marginEnd="10dp"
+                android:layout_marginEnd="5dp"
                 android:layout_weight="1"
                 app:currentValue="16"
                 app:endText="大"
@@ -58,7 +58,7 @@
                 android:id="@+id/slider_line_spacing"
                 android:layout_width="0dp"
                 android:layout_height="55dp"
-                android:layout_marginStart="10dp"
+                android:layout_marginStart="5dp"
                 android:layout_weight="1"
                 app:currentValue="13"
                 app:endText="松"

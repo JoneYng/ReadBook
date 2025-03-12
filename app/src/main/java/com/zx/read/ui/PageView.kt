@@ -155,7 +155,7 @@ class PageView(context: Context, attrs: AttributeSet) :
     }
 
     override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
-        return true
+        return false
     }
     /**
      * 触摸事件

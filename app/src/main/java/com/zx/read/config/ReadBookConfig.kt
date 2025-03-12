@@ -304,7 +304,7 @@ object ReadBookConfig {
         var letterSpacing: Float = 0.1f,//字间距
         var lineSpacingExtra: Int = 13,//行间距
         var paragraphSpacing: Int = 4,//段距
-        var titleMode: Int = 2,//标题居中 0 居左 ，1 居中 ，2不显示
+        var titleMode: Int = 0,//标题居中 0 居左 ，1 居中 ，2不显示
         var titleSize: Int = 5,//标题大小
         var titleTopSpacing: Int = 0, //标题顶部间距
         var titleBottomSpacing: Int = 0,//标题底部间距

@@ -17,12 +17,14 @@
         android:paddingLeft="20dp"
         android:paddingRight="20dp">
         <TextView
+            android:id="@+id/action_menu_copy"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="复制"
             android:textColor="@color/white">
         </TextView>
         <TextView
+            android:id="@+id/action_menu_underline"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
@@ -31,6 +33,7 @@
         </TextView>
 
         <TextView
+            android:id="@+id/action_menu_note"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
@@ -39,6 +42,7 @@
         </TextView>
 
         <TextView
+            android:id="@+id/action_menu_ai"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
@@ -46,6 +50,7 @@
             android:textColor="@color/white">
         </TextView>
         <TextView
+            android:id="@+id/action_menu_listen_to_the_current"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"

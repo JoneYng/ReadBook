@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.core.view.get
-import com.zx.read.BaseDialogFragment
+import com.zx.read.base.BaseDialogFragment
 import com.zx.read.ReadActivity
 import com.zx.read.ReadBook
 import com.zx.read.config.ReadBookConfig

@@ -3,8 +3,10 @@ package com.zx.read.ui
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.util.Log
 import android.view.LayoutInflater
 import android.widget.FrameLayout
+import android.widget.Toast
 import androidx.core.view.isGone
 import com.zx.read.bean.TextPage
 import com.zx.read.config.ReadBookConfig
@@ -40,6 +42,11 @@ class ContentView(context: Context) : FrameLayout(context) {
         binding.contentTextView.upView = {
             setProgress(it)
         }
+//        myView.x = 100f   // X 轴位置
+//        binding.llTestScroll.y = 200f   // Y 轴位置
+//        binding.llTestScroll.setOnClickListener {
+//            Toast.makeText(context, "点击事件", Toast.LENGTH_SHORT).show()
+//        }
     }
 
     fun upStyle() = with(binding){
@@ -90,6 +97,8 @@ class ContentView(context: Context) : FrameLayout(context) {
     }
 
     fun onScroll(offset: Float) {
+        Log.i("onScroll","onScroll $offset")
+        binding.llTestScroll.y += offset
         binding.contentTextView.onScroll(offset)
     }
 
