@@ -292,7 +292,7 @@ object ReadBook {
             }
         }.onError {
             it.printStackTrace()
-            App.INSTANCE.toast("ChapterProvider ERROR:\n${it.getStackTraceString()}")
+//            App.INSTANCE.toast("ChapterProvider ERROR:\n${it.getStackTraceString()}")
         }
     }
 

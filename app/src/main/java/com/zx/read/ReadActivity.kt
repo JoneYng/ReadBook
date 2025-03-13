@@ -3,14 +3,12 @@ package com.zx.read
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil.setContentView
 import com.zx.read.bean.Book
 import com.zx.read.dialog.ReadStyleDialog
 import com.zx.read.dialog.TextActionMenu
@@ -19,14 +17,12 @@ import com.zx.read.extensions.statusBarHeight
 import com.zx.read.extensions.visible
 import com.zx.read.factory.TextPageFactory
 import com.zx.read.ui.ContentTextView
-import com.zx.read.ui.CustomSliderView
 import com.zx.read.ui.PageView
 import com.zx.read.ui.ReadMenu
 import com.zx.readbook.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.toast
 
 class ReadActivity : AppCompatActivity(), View.OnTouchListener, PageView.CallBack,
     TextActionMenu.CallBack, ContentTextView.CallBack, ReadBook.CallBack, ReadMenu.CallBack,
@@ -61,8 +57,9 @@ class ReadActivity : AppCompatActivity(), View.OnTouchListener, PageView.CallBac
             MotionEvent.ACTION_DOWN -> {
                 textActionMenu.dismiss()
             }
+
             MotionEvent.ACTION_MOVE -> {
-                handleCursorSelection(event, cursorLeft, cursorRight,v, pageView)
+                handleCursorSelection(event, cursorLeft, cursorRight, v, pageView)
             }
 
             MotionEvent.ACTION_UP -> showTextActionMenu()
@@ -133,7 +130,7 @@ class ReadActivity : AppCompatActivity(), View.OnTouchListener, PageView.CallBac
             popup.contentView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
             val popupHeight = popup.contentView.measuredHeight
             val x = textMenuPosition.x.toInt()
-            var y = textMenuPosition.y.toInt() - popupHeight/2
+            var y = textMenuPosition.y.toInt() - popupHeight / 2
             if (y < statusBarHeight) {
                 y = (cursorLeft.y + cursorLeft.height).toInt()
             }
@@ -144,10 +141,7 @@ class ReadActivity : AppCompatActivity(), View.OnTouchListener, PageView.CallBac
                 popup.showAtLocation(textMenuPosition, Gravity.TOP or Gravity.START, x, y)
             } else {
                 popup.update(
-                    x,
-                    y,
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
+                    x, y, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
                 )
             }
         }

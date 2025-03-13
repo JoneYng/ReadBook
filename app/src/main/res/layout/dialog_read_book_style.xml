@@ -72,10 +72,6 @@
                 app:trackHeight="40dp" />
         </LinearLayout>
 
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="0.5" />
 
         <TextView
             android:id="@+id/fl_text_Bold"
@@ -99,7 +95,7 @@
             android:textColor="@color/black"
             android:textSize="15sp"
             android:layout_margin="20dp"
-
+            android:textStyle="bold"
             />
         <RadioGroup
             android:id="@+id/rg_page_anim"
@@ -183,10 +179,17 @@
 
         </RadioGroup>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0.8dp"
-            android:background="@color/bg_divider_line" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:text="背景"
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="20dp"
+            android:textStyle="bold"
+            />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_style"
@@ -194,7 +197,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:paddingHorizontal="10dp"
-            android:paddingTop="12dp"
+            android:layout_margin="20dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/item_read_style" />
 

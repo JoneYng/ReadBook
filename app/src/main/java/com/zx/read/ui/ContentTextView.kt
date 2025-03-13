@@ -21,6 +21,7 @@ import com.zx.read.factory.TextPageFactory
 import com.zx.read.extensions.activity
 import com.zx.read.bean.TextLine
 import com.zx.read.bean.TextPage
+import com.zx.read.config.ReadBookConfig.emptyString
 import com.zx.read.extensions.getPrefBoolean
 import com.zx.readbook.R
 import kotlinx.coroutines.CoroutineScope
@@ -170,22 +171,27 @@ class ContentTextView(context: Context, attrs: AttributeSet?) : View(context, at
         var selectionStartX = 0f //开始位置
         var selectionEndX = 0f//结束位置
         var baselineY = 0f
-        textLine.textChars.forEachIndexed { index, it ->
-            canvas.drawText(it.charData, it.start, lineBase, textPaint)
-            if (it.selected) {
-                canvas.drawRect(it.start, lineTop, it.end, lineBottom, selectedPaint)
+        textLine.textChars.forEachIndexed { index, textChar ->
+            // 绘制字符
+            canvas.drawText(textChar.charData, textChar.start, lineBase, textPaint)
+            if (textChar.selected) {
+                canvas.drawRect(textChar.start, lineTop, textChar.end, lineBottom, selectedPaint)
             }
             baselineY = lineBottom
         }
         if(textLine.text.contains("资本主义的发展")){
-//            //直线
-//            drawLine(canvas, textLine.textChars.get(3).start, textLine.textChars.get(10).end, baselineY, LineType.STRAIGHT)
-//            //直线-虚线
-//            drawLine(canvas,textLine.textChars.get(12).start, textLine.textChars.get(20).end, baselineY, LineType.DASHED)
-//            //曲线
-//            drawLine(canvas, textLine.textChars.get(22).start, textLine.textChars.get(30).end, baselineY, LineType.WAVY)
-//            //背景
-//            canvas.drawRect(textLine.textChars.get(32).start, lineTop, textLine.textChars.get(40).end, baselineY, selectedPaint)
+            try {
+                //直线
+                drawLine(canvas, textLine.textChars.get(3).start, textLine.textChars.get(10).end, baselineY, LineType.STRAIGHT)
+                //直线-虚线
+                drawLine(canvas,textLine.textChars.get(12).start, textLine.textChars.get(20).end, baselineY, LineType.DASHED)
+                //曲线
+                drawLine(canvas, textLine.textChars.get(22).start, textLine.textChars.get(30).end, baselineY, LineType.WAVY)
+                //背景
+                canvas.drawRect(textLine.textChars.get(32).start, lineTop, textLine.textChars.get(40).end, baselineY, selectedPaint)
+            }catch (e:Exception){
+
+            }
         }
 
     }
@@ -352,6 +358,10 @@ class ContentTextView(context: Context, attrs: AttributeSet?) : View(context, at
                 if (y > textLine.lineTop + relativeOffset && y < textLine.lineBottom + relativeOffset) {
                     for ((charIndex, textChar) in textLine.textChars.withIndex()) {
                         if (x > textChar.start && x < textChar.end) {
+                            //如果是空，不设置选中
+                            if(textChar.charData== emptyString){
+                                return
+                            }
                             if (selectStart[0] != relativePos || selectStart[1] != lineIndex || selectStart[2] != charIndex) {
                                 //开始坐标大于结束坐标
                                 if (selectToInt(relativePos, lineIndex, charIndex) > selectToInt(
@@ -455,24 +465,44 @@ class ContentTextView(context: Context, attrs: AttributeSet?) : View(context, at
     }
 
     private fun upSelectChars() {
+        //// 判断是滚动模式还是非滚动模式
         val last = if (callBack.isScroll) 2 else 0
+        // 遍历每一页
         for (relativePos in 0..last) {
+            // 遍历每一行
             for ((lineIndex, textLine) in relativePage(relativePos).textLines.withIndex()) {
+                // 遍历每个字符
                 for ((charIndex, textChar) in textLine.textChars.withIndex()) {
+                    // 跳过段落开头的缩进空字符
+                    if ((charIndex == 0||charIndex == 1) && textChar.charData == emptyString) continue
+
                     textChar.selected =
+                        // 情况1：起始点和结束点在同一页、同一行，字符索引位于起止点之间
                         if (relativePos == selectStart[0] && relativePos == selectEnd[0] && lineIndex == selectStart[1] && lineIndex == selectEnd[1]) {
                             charIndex in selectStart[2]..selectEnd[2]
-                        } else if (relativePos == selectStart[0] && lineIndex == selectStart[1]) {
+                        }
+                        // 情况2：当前字符在起始点所在页的起始行内，且字符索引在起始点之后
+                        else if (relativePos == selectStart[0] && lineIndex == selectStart[1]) {
                             charIndex >= selectStart[2]
-                        } else if (relativePos == selectEnd[0] && lineIndex == selectEnd[1]) {
+                        }
+                        // 情况3：当前字符在结束点所在页的结束行内，且字符索引在结束点之前
+                        else if (relativePos == selectEnd[0] && lineIndex == selectEnd[1]) {
                             charIndex <= selectEnd[2]
-                        } else if (relativePos == selectStart[0] && relativePos == selectEnd[0]) {
+                        }
+                        // 情况4：起始点和结束点在同一页，但字符位于中间行
+                        else if (relativePos == selectStart[0] && relativePos == selectEnd[0]) {
                             lineIndex in (selectStart[1] + 1) until selectEnd[1]
-                        } else if (relativePos == selectStart[0]) {
+                        }
+                        // 情况5：当前字符在起始点所在页，位于起始行之后的其他行
+                        else if (relativePos == selectStart[0]) {
                             lineIndex > selectStart[1]
-                        } else if (relativePos == selectEnd[0]) {
+                        }
+                        // 情况6：当前字符在结束点所在页，位于结束行之前的其他行
+                        else if (relativePos == selectEnd[0]) {
                             lineIndex < selectEnd[1]
-                        } else {
+                        }
+                        // 情况7：当前字符在完全选中范围内的中间页
+                        else {
                             relativePos in selectStart[0] + 1 until selectEnd[0]
                         }
                 }

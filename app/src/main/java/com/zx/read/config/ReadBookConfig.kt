@@ -28,6 +28,7 @@ import java.io.File
  * 阅读界面配置
  */
 object ReadBookConfig {
+    val emptyString: String = "\u3000"//空字符串
     const val configFileName = "readConfig.json"
     const val shareConfigFileName = "shareReadConfig.json"
     val configFilePath = FileUtils.getPath(App.INSTANCE.filesDir, configFileName)
@@ -308,7 +309,7 @@ object ReadBookConfig {
         var titleSize: Int = 5,//标题大小
         var titleTopSpacing: Int = 0, //标题顶部间距
         var titleBottomSpacing: Int = 0,//标题底部间距
-        var paragraphIndent: String = "　　",//段落缩进
+        var paragraphIndent: String = emptyString+emptyString,//段落缩进
         var paddingBottom: Int = 16,//页面边距底部
         var paddingLeft: Int = 16,//页面边距左边
         var paddingRight: Int = 16,//页面边距右边
