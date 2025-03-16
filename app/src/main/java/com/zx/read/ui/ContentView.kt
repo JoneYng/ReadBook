@@ -2,12 +2,19 @@ package com.zx.read.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
 import android.widget.FrameLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.isGone
+import com.zx.read.bean.TextChar
 import com.zx.read.bean.TextPage
 import com.zx.read.config.ReadBookConfig
 import com.zx.read.extensions.statusBarHeight
@@ -33,6 +40,14 @@ class ContentView(context: Context) : FrameLayout(context) {
             val h2 = 0
             return h1 + h2
         }
+    // 创建一个按钮并设置样式
+    val button = Button(context).apply {
+        text = "去考试"
+        setBackgroundColor(Color.BLUE)
+        setOnClickListener {
+            Toast.makeText(context, "去考试", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     init {
         //设置背景防止切换背景时文字重叠
@@ -42,11 +57,22 @@ class ContentView(context: Context) : FrameLayout(context) {
         binding.contentTextView.upView = {
             setProgress(it)
         }
-//        myView.x = 100f   // X 轴位置
-//        binding.llTestScroll.y = 200f   // Y 轴位置
-//        binding.llTestScroll.setOnClickListener {
-//            Toast.makeText(context, "点击事件", Toast.LENGTH_SHORT).show()
-//        }
+
+        binding.contentTextView.drawLayout = { top->
+            if(button.parent!=null){
+                if(top>0){
+                    val layoutParams = button.layoutParams as ViewGroup.MarginLayoutParams
+                    val marginTop = layoutParams.topMargin ?: 0
+                    if(top.toInt()!=marginTop){
+                        layoutParams.setMargins(50, top.toInt(), 50, 0)
+                        button.layoutParams = layoutParams
+                        button.visibility=View.VISIBLE
+                    }
+                }else{
+                    button.visibility=View.GONE
+                }
+            }
+        }
     }
 
     fun upStyle() = with(binding){
@@ -84,21 +110,42 @@ class ContentView(context: Context) : FrameLayout(context) {
         setProgress(textPage)
         if (resetPageOffset)
             resetPageOffset()
-        binding.contentTextView.setContent(textPage)
+
     }
 
     fun resetPageOffset() {
         binding.contentTextView.resetPageOffset()
     }
 
+
+
     @SuppressLint("SetTextI18n")
     fun setProgress(textPage: TextPage) = textPage.apply {
+        Log.i("drawLayout", "setProgress:$textPage")
+
+        //设置当前布局
+        binding.flBookPage.removeView(button)
+        binding.contentTextView.setContent(textPage)
+        textPage.textLines.forEach {
+            if(it.isLayout){
+                // 创建 LayoutParams 并设置位置
+                val layoutParams = FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT, // 宽度
+                    FrameLayout.LayoutParams.WRAP_CONTENT  // 高度
+                ).apply {
+                    gravity = Gravity.TOP or Gravity.END  // 设置控件在右上角
+                    setMargins(50, it.lineTop.toInt(), 50, 0)             // 设置具体的偏移位置
+                }
+                // 将按钮添加到 FrameLayout
+                binding.flBookPage.addView(button, layoutParams)
+            }
+        }
+
+        //设置当前页码，进度
         tvPageAndTotal?.text = "${index.plus(1)}/$pageSize  $readProgress"
     }
 
     fun onScroll(offset: Float) {
-        Log.i("onScroll","onScroll $offset")
-        binding.llTestScroll.y += offset
         binding.contentTextView.onScroll(offset)
     }
 
@@ -106,6 +153,10 @@ class ContentView(context: Context) : FrameLayout(context) {
         binding.contentTextView.selectAble = selectAble
     }
 
+
+    fun  setTextUnderline(type: LineType){
+        binding.contentTextView.setTextUnderline(type)
+    }
     fun selectText(
         x: Float, y: Float,
         select: (relativePage: Int, lineIndex: Int, charIndex: Int) -> Unit
@@ -133,6 +184,10 @@ class ContentView(context: Context) : FrameLayout(context) {
         binding.contentTextView.cancelSelect()
     }
 
-    val selectedText: String get() = binding.contentTextView.selectedText
+    fun contentTextView():ContentTextView {
+       return binding.contentTextView
+    }
+
+    val selectedText: ArrayList<TextChar> get() = binding.contentTextView.selectedText
 
 }

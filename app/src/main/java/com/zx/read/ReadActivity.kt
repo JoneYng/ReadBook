@@ -3,6 +3,7 @@ package com.zx.read
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
@@ -10,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.zx.read.bean.Book
+import com.zx.read.bean.TextChar
 import com.zx.read.dialog.ReadStyleDialog
 import com.zx.read.dialog.TextActionMenu
 import com.zx.read.extensions.invisible
@@ -17,6 +19,7 @@ import com.zx.read.extensions.statusBarHeight
 import com.zx.read.extensions.visible
 import com.zx.read.factory.TextPageFactory
 import com.zx.read.ui.ContentTextView
+import com.zx.read.ui.LineType
 import com.zx.read.ui.PageView
 import com.zx.read.ui.ReadMenu
 import com.zx.readbook.R
@@ -39,11 +42,18 @@ class ReadActivity : AppCompatActivity(), View.OnTouchListener, PageView.CallBac
     override val isInitFinish: Boolean get() = true
     override val isAutoPage: Boolean get() = false
     override val autoPageProgress: Int get() = 0
-    override val selectedText: String
+    override val selectedText: ArrayList<TextChar>
         get() = pageView.curPage.selectedText
 
 
     override fun onMenuActionFinally() {
+    }
+
+    /**
+     * 划线回调
+     */
+    override fun onUnderline(type: LineType) {
+        pageView.curPage.setTextUnderline(type)
     }
 
     private val textActionMenu: TextActionMenu by lazy {
@@ -126,6 +136,9 @@ class ReadActivity : AppCompatActivity(), View.OnTouchListener, PageView.CallBac
     }
 
     override fun showTextActionMenu() {
+        var selectedText=selectedText
+        Log.i("zxzx", selectedText.toString())
+
         textActionMenu.let { popup ->
             popup.contentView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
             val popupHeight = popup.contentView.measuredHeight

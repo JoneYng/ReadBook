@@ -15,6 +15,7 @@ data class TextLine(
     var lineBottom: Float = 0f,//一行文字距下的高度
     val isTitle: Boolean = false,//是否是标题
     val isImage: Boolean = false,//是否是图片
+    val isLayout: Boolean = false,//是否是布局
     var isReadAloud: Boolean = false
 ) {
 

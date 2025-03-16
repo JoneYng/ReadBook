@@ -7,6 +7,7 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.RectF
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import android.view.ViewConfiguration
 import android.widget.FrameLayout
@@ -201,6 +202,16 @@ class PageView(context: Context, attrs: AttributeSet) :
                 if (!pressDown) return true
                 if (!isMove) {
                     if (!longPressed && !pressOnTextSelected) {
+                        //判断是否选中下划线文字
+                        val x = event.x
+                        val y = event.y
+                        for ((rect, text) in curPage.contentTextView().underlineRects) {
+                            if (rect.contains(x, y)) {
+                                curPage.contentTextView().onUnderlineClick(text)  // 触发点击事件，返回文本内容
+                                return true
+                            }
+                        }
+
                         onSingleTapUp()
                         return true
                     }

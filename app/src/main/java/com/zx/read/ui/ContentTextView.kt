@@ -2,27 +2,30 @@ package com.zx.read.ui
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.DashPathEffect
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
+import android.widget.Toast
 import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat
-import com.zx.read.provider.ChapterProvider
-import com.zx.read.provider.ImageProvider
 import com.zx.read.PreferKey
 import com.zx.read.ReadBook
-import com.zx.read.config.ReadBookConfig
-import com.zx.read.factory.TextPageFactory
-import com.zx.read.extensions.activity
+import com.zx.read.bean.TextChar
 import com.zx.read.bean.TextLine
 import com.zx.read.bean.TextPage
+import com.zx.read.bean.UnderLine
+import com.zx.read.config.ReadBookConfig
 import com.zx.read.config.ReadBookConfig.emptyString
+import com.zx.read.extensions.activity
 import com.zx.read.extensions.getPrefBoolean
+import com.zx.read.factory.TextPageFactory
+import com.zx.read.provider.ChapterProvider
+import com.zx.read.provider.ImageProvider
 import com.zx.readbook.R
 import kotlinx.coroutines.CoroutineScope
 import kotlin.math.min
@@ -62,11 +65,17 @@ class ContentTextView(context: Context, attrs: AttributeSet?) : View(context, at
 
     var upView: ((TextPage) -> Unit)? = null
 
+    //绘制布局
+    var drawLayout: ((Float) -> Unit)? = null
+
     //滚动参数
     private val pageFactory: TextPageFactory get() = callBack.pageFactory
 
     //页面偏移
     private var pageOffset = 0f
+
+    // 存储下划线区域及对应的文本
+    val underlineRects = mutableListOf<Pair<RectF, String>>()
 
     init {
         callBack = activity as CallBack
@@ -145,6 +154,8 @@ class ContentTextView(context: Context, attrs: AttributeSet?) : View(context, at
         val lineBottom = textLine.lineBottom + relativeOffset
         if (textLine.isImage) {
             drawImage(canvas, textLine, lineTop, lineBottom)
+        } else if (textLine.isLayout) {
+            drawLayout?.invoke(lineTop)
         } else {
             drawChars(
                 canvas, lineTop, lineBase, lineBottom, textLine
@@ -168,33 +179,55 @@ class ContentTextView(context: Context, attrs: AttributeSet?) : View(context, at
         textPaint.color =
             if (textLine.isReadAloud) ReadBookConfig.textColor else ReadBookConfig.textColor
 
-        var selectionStartX = 0f //开始位置
-        var selectionEndX = 0f//结束位置
-        var baselineY = 0f
+        var startX = 0f
+        var endX = 0f
+        val underLineList: MutableList<UnderLine> = mutableListOf()
+        val selectedText = StringBuilder()
+        //选中开始位置
         textLine.textChars.forEachIndexed { index, textChar ->
             // 绘制字符
             canvas.drawText(textChar.charData, textChar.start, lineBase, textPaint)
             if (textChar.selected) {
+                selectedText.append(textChar.charData)  // 记录选中的文本
                 canvas.drawRect(textChar.start, lineTop, textChar.end, lineBottom, selectedPaint)
             }
-            baselineY = lineBottom
+            //划线开始位置判断
+            if (textChar.isUnderLineStart) {
+                startX = textChar.start
+            } else if (textChar.type != null && index == 0) {
+                startX = textChar.start
+            } else if (textChar.type != null && index == 2 && textLine.textChars[0].charData == emptyString && textLine.textChars[1].charData == emptyString) {
+                startX = textChar.start
+            }
+            //划线结束位置判断
+            if (textChar.isUnderLineEnd || (textChar.type != null && index == textLine.textChars.size - 1)) {
+                endX = textChar.end
+                underLineList.add(UnderLine(startX, endX, selectedText.toString(), textChar.type!!))
+                startX = 0f
+                endX = 0f
+            }
         }
-        if(textLine.text.contains("资本主义的发展")){
+        underLineList.forEachIndexed { index, underLine ->
             try {
-                //直线
-                drawLine(canvas, textLine.textChars.get(3).start, textLine.textChars.get(10).end, baselineY, LineType.STRAIGHT)
-                //直线-虚线
-                drawLine(canvas,textLine.textChars.get(12).start, textLine.textChars.get(20).end, baselineY, LineType.DASHED)
-                //曲线
-                drawLine(canvas, textLine.textChars.get(22).start, textLine.textChars.get(30).end, baselineY, LineType.WAVY)
-                //背景
-                canvas.drawRect(textLine.textChars.get(32).start, lineTop, textLine.textChars.get(40).end, baselineY, selectedPaint)
-            }catch (e:Exception){
+                // 记录下划线区域及对应的文本
+                val rect =
+                    RectF(underLine.startX, lineTop, underLine.endX, lineBottom)  // 5f 是下划线的高度
+                underlineRects.add(Pair(rect, underLine.selectedText.toString()))
+                drawLine(
+                    canvas, underLine.startX, underLine.endX, lineBottom, lineTop, underLine.type
+                )
+            } catch (e: Exception) {
 
             }
         }
-
     }
+
+    fun onUnderlineClick(text: String) {
+        if(!text.isNullOrEmpty()){
+            Toast.makeText(context, "点击内容：$text", Toast.LENGTH_SHORT).show()
+        }
+    }
+
 
 
     /**
@@ -213,6 +246,7 @@ class ContentTextView(context: Context, attrs: AttributeSet?) : View(context, at
         startX: Float,
         endX: Float,
         y: Float,
+        lineTop: Float,
         type: LineType,
         waveHeight: Float = 10f,
         waveLength: Float = 20f
@@ -252,6 +286,10 @@ class ContentTextView(context: Context, attrs: AttributeSet?) : View(context, at
                 }
                 canvas.drawPath(path, linePaint)
             }
+
+            LineType.BACKGROUND_COLOR -> {
+                canvas.drawRect(startX, lineTop, endX, y, selectedPaint)
+            }
         }
     }
 
@@ -266,39 +304,95 @@ class ContentTextView(context: Context, attrs: AttributeSet?) : View(context, at
             ReadBook.book?.let { book ->
                 val rectF = RectF(textChar.start, lineTop, textChar.end, lineBottom)
                 ImageProvider.getImage(book, textPage.chapterIndex, textChar.charData, true)?.let {
-                        canvas.drawBitmap(it, null, rectF, null)
-                    }
+                    canvas.drawBitmap(it, null, rectF, null)
+                }
             }
         }
     }
 
     /**
-     * 滚动事件
+     * 处理页面偏移，实现阅读器的翻页逻辑
      */
     fun onScroll(mOffset: Float) {
         if (mOffset == 0f) return
+        // 累加偏移量，表示当前页面的偏移值
         pageOffset += mOffset
+        // ========== 边界控制：处理第一页和最后一页的边界情况 ==========
+        // 已是第一页，且用户尝试向右翻页（正方向）
         if (!pageFactory.hasPrev() && pageOffset > 0) {
+            // 停止偏移，避免越界
             pageOffset = 0f
-        } else if (!pageFactory.hasNext() && pageOffset < 0 && pageOffset + textPage.height < ChapterProvider.visibleHeight) {
+        }
+        // 已是最后一页，且向左翻页（负方向）且内容高度小于可视高度
+        else if (!pageFactory.hasNext() && pageOffset < 0 && pageOffset + textPage.height < ChapterProvider.visibleHeight) {
+            // 计算剩余空间
             val offset = ChapterProvider.visibleHeight - textPage.height
+            // 限制 `pageOffset`，避免超出可视范围
             pageOffset = min(0f, offset)
-        } else if (pageOffset > 0) {
+        }
+        // ========== 翻页逻辑 ==========
+        // 向右翻页：上一页逻辑
+        else if (pageOffset > 0) {
+            // 翻到上一页
             pageFactory.moveToPrev(false)
+            // 更新当前页
             textPage = pageFactory.currentPage
+            // 调整偏移量，保持连续性
             pageOffset -= textPage.height
-            upView?.invoke(textPage)
-        } else if (pageOffset < -textPage.height) {
-            pageOffset += textPage.height
-            pageFactory.moveToNext(false)
-            textPage = pageFactory.currentPage
+            // 更新视图
             upView?.invoke(textPage)
         }
+        // 向左翻页：下一页逻辑
+        else if (pageOffset < -textPage.height) {
+            // 调整偏移量，保持连续性
+            pageOffset += textPage.height
+            // 翻到下一页
+            pageFactory.moveToNext(false)
+            // 更新当前页
+            textPage = pageFactory.currentPage
+            // 更新视图
+            upView?.invoke(textPage)
+        }
+        // ========== 强制刷新视图，确保 UI 更新 ==========
         invalidate()
     }
 
     fun resetPageOffset() {
         pageOffset = 0f
+    }
+
+    /**
+     * 设置文字划线
+     */
+    fun setTextUnderline(type: LineType) {
+        var relativeOffset: Float
+        for (relativePos in 0..2) {
+            relativeOffset = relativeOffset(relativePos)
+            if (relativePos > 0) {
+                //滚动翻页
+                if (!callBack.isScroll) return
+                if (relativeOffset >= ChapterProvider.visibleHeight) return
+            }
+            var startSet = false  // 记录是否已经找到起始位置
+            var endChar: TextChar? = null  // 记录最后一个选中的字符
+            for ((lineIndex, textLine) in relativePage(relativePos).textLines.withIndex()) {
+                for ((charIndex, textChar) in textLine.textChars.withIndex()) {
+                    if (textChar.selected) {
+                        if (!startSet) {
+                            textChar.isUnderLineStart = true  // 第一个被选中的字符
+                            startSet = true
+                        } else {
+                            textChar.isUnderLineStart = false
+                        }
+                        endChar = textChar  // 不断更新最后一个被选中的字符
+                        textChar.type = type  // 设置类型
+                    }
+                }
+            }
+            // 最后一个被选中的字符是结束位置
+            endChar?.isUnderLineEnd = true
+            invalidate()
+        }
     }
 
     /**
@@ -359,7 +453,7 @@ class ContentTextView(context: Context, attrs: AttributeSet?) : View(context, at
                     for ((charIndex, textChar) in textLine.textChars.withIndex()) {
                         if (x > textChar.start && x < textChar.end) {
                             //如果是空，不设置选中
-                            if(textChar.charData== emptyString){
+                            if (textChar.charData == emptyString) {
                                 return
                             }
                             if (selectStart[0] != relativePos || selectStart[1] != lineIndex || selectStart[2] != charIndex) {
@@ -474,10 +568,10 @@ class ContentTextView(context: Context, attrs: AttributeSet?) : View(context, at
                 // 遍历每个字符
                 for ((charIndex, textChar) in textLine.textChars.withIndex()) {
                     // 跳过段落开头的缩进空字符
-                    if ((charIndex == 0||charIndex == 1) && textChar.charData == emptyString) continue
+                    if ((charIndex == 0 || charIndex == 1) && textChar.charData == emptyString) continue
 
                     textChar.selected =
-                        // 情况1：起始点和结束点在同一页、同一行，字符索引位于起止点之间
+                            // 情况1：起始点和结束点在同一页、同一行，字符索引位于起止点之间
                         if (relativePos == selectStart[0] && relativePos == selectEnd[0] && lineIndex == selectStart[1] && lineIndex == selectEnd[1]) {
                             charIndex in selectStart[2]..selectEnd[2]
                         }
@@ -532,62 +626,87 @@ class ContentTextView(context: Context, attrs: AttributeSet?) : View(context, at
         callBack.onCancelSelect()
     }
 
-    val selectedText: String
+    val selectedText: ArrayList<TextChar>
         get() {
-            val stringBuilder = StringBuilder()
+            val textChars: ArrayList<TextChar> = arrayListOf() // 存储选中的文字
+
+            // 遍历起始页到结束页之间的内容
             for (relativePos in selectStart[0]..selectEnd[0]) {
-                val textPage = relativePage(relativePos)
+                val textPage = relativePage(relativePos) // 获取当前页的文本数据
+                val textLines = textPage.textLines // 获取当前页的行数据
+
+                // 情况 1：起始点和结束点在同一页
                 if (relativePos == selectStart[0] && relativePos == selectEnd[0]) {
                     for (lineIndex in selectStart[1]..selectEnd[1]) {
                         if (lineIndex == selectStart[1] && lineIndex == selectEnd[1]) {
-                            stringBuilder.append(
-                                textPage.textLines[lineIndex].text.substring(
-                                    selectStart[2], selectEnd[2] + 1
+                            // 起始点和结束点在同一行，截取范围内的字符
+                            val startIndex = selectStart[2]
+                            val endIndex = selectEnd[2] + 1
+                            textChars.addAll(
+                                textLines[lineIndex].textChars.subList(
+                                    startIndex, endIndex
                                 )
                             )
                         } else if (lineIndex == selectStart[1]) {
-                            stringBuilder.append(
-                                textPage.textLines[lineIndex].text.substring(
-                                    selectStart[2]
+                            // 起始行，选中起始点到行尾
+                            textChars.addAll(
+                                textLines[lineIndex].textChars.subList(
+                                    selectStart[2], textLines[lineIndex].textChars.size
                                 )
                             )
                         } else if (lineIndex == selectEnd[1]) {
-                            stringBuilder.append(
-                                textPage.textLines[lineIndex].text.substring(0, selectEnd[2] + 1)
-                            )
-                        } else {
-                            stringBuilder.append(textPage.textLines[lineIndex].text)
-                        }
-                    }
-                } else if (relativePos == selectStart[0]) {
-                    for (lineIndex in selectStart[1] until relativePage(relativePos).textLines.size) {
-                        if (lineIndex == selectStart[1]) {
-                            stringBuilder.append(
-                                textPage.textLines[lineIndex].text.substring(
-                                    selectStart[2]
+                            // 结束行，选中行头到结束点
+                            textChars.addAll(
+                                textLines[lineIndex].textChars.subList(
+                                    0, selectEnd[2] + 1
                                 )
                             )
                         } else {
-                            stringBuilder.append(textPage.textLines[lineIndex].text)
+                            // 其他完整行
+                            textChars.addAll(textLines[lineIndex].textChars)
                         }
                     }
-                } else if (relativePos == selectEnd[0]) {
-                    for (lineIndex in 0..selectEnd[1]) {
-                        if (lineIndex == selectEnd[1]) {
-                            stringBuilder.append(
-                                textPage.textLines[lineIndex].text.substring(0, selectEnd[2] + 1)
+                }
+
+                // 情况 2：起始点在当前页，但结束点在后续页
+                else if (relativePos == selectStart[0]) {
+                    for (lineIndex in selectStart[1] until textLines.size) {
+                        if (lineIndex == selectStart[1]) {
+                            textChars.addAll(
+                                textLines[lineIndex].textChars.subList(
+                                    selectStart[2], textLines[lineIndex].textChars.size
+                                )
                             )
                         } else {
-                            stringBuilder.append(textPage.textLines[lineIndex].text)
+                            textChars.addAll(textLines[lineIndex].textChars)
                         }
                     }
-                } else if (relativePos in selectStart[0] + 1 until selectEnd[0]) {
-                    for (lineIndex in selectStart[1]..selectEnd[1]) {
-                        stringBuilder.append(textPage.textLines[lineIndex].text)
+                }
+
+                // 情况 3：结束点在当前页，但起始点在前页
+                else if (relativePos == selectEnd[0]) {
+                    for (lineIndex in 0..selectEnd[1]) {
+                        if (lineIndex == selectEnd[1]) {
+                            textChars.addAll(
+                                textLines[lineIndex].textChars.subList(
+                                    0, selectEnd[2] + 1
+                                )
+                            )
+                        } else {
+                            textChars.addAll(textLines[lineIndex].textChars)
+                        }
+                    }
+                }
+
+                // 情况 4：完整选中页（在起始页和结束页之间）
+                else if (relativePos in selectStart[0] + 1 until selectEnd[0]) {
+                    for (lineIndex in textLines.indices) {
+                        textChars.addAll(textLines[lineIndex].textChars)
                     }
                 }
             }
-            return stringBuilder.toString()
+
+            return textChars
         }
 
     private fun selectToInt(page: Int, line: Int, char: Int): Int {
@@ -635,5 +754,6 @@ class ContentTextView(context: Context, attrs: AttributeSet?) : View(context, at
 enum class LineType {
     STRAIGHT, // 直线
     DASHED,   // 虚线
+    BACKGROUND_COLOR,   //背景色
     WAVY      // 波浪线
 }

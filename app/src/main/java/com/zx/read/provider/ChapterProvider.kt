@@ -6,6 +6,7 @@ import android.os.Build
 import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
+import android.util.Log
 import com.zx.read.App
 import com.zx.read.AppPattern
 import com.zx.read.bean.Book
@@ -144,16 +145,23 @@ object ChapterProvider {
         //添加一个空页面
         textPages.add(TextPage())
         contents.forEachIndexed { index, text ->
-            val matcher = AppPattern.imgPattern.matcher(text)
-            if (matcher.find()) {
-                var src = matcher.group(1)
+            val imgMatcher = AppPattern.imgPattern.matcher(text)
+            val layoutMatcher = AppPattern.layoutPattern.matcher(text)
+            if (imgMatcher.find()) {
+                var src = imgMatcher.group(1)
                 src = NetworkUtils.getAbsoluteURL("", src)
                 src?.let {
                     durY = setTypeImage(
                         book, bookChapter, src, durY, textPages, imageStyle
                     )
                 }
-            } else {
+            } else if(layoutMatcher.find()){
+                var tupe = layoutMatcher.group(1)
+                Log.i("type", "tupe:$tupe")
+                tupe?.let {
+                    durY = setTypeLayout( tupe, durY, textPages)
+                }
+            }else {
                 val isTitle = index == 0
                 if (!(isTitle && ReadBookConfig.titleMode == 2)) {
                     durY =
@@ -192,6 +200,55 @@ object ChapterProvider {
             chapterSize
         )
     }
+
+    /**
+     * 排版布局
+     */
+    private fun setTypeLayout(
+        layout: String,
+        y: Float,
+        textPages: ArrayList<TextPage>,
+    ): Float {
+        var durY = y
+        //当前偏移高度大于显示高度
+        if (durY > visibleHeight) {
+            textPages.last().height = durY
+            textPages.add(TextPage())
+            durY = 0f
+        }
+        var height = 200f.toInt()
+        var width = 100f.toInt()
+        //布局高度+当前高度>显示高度
+        if (durY + height > visibleHeight) {
+            textPages.last().height = durY
+            textPages.add(TextPage())
+            durY = 0f
+        }
+        val textLine = TextLine(isLayout = true)
+        textLine.lineTop = durY
+        durY += height
+        textLine.lineBottom = durY
+        val (start, end) = if (visibleWidth > width) {
+            val adjustWidth = (visibleWidth - width) / 2f
+            Pair(
+                paddingLeft.toFloat() + adjustWidth,
+                paddingLeft.toFloat() + adjustWidth + width
+            )
+        } else {
+            Pair(paddingLeft.toFloat(), (paddingLeft + width).toFloat())
+        }
+        textLine.textChars.add(
+            TextChar(
+                charData = "",
+                start = start,
+                end = end,
+                isImage = true
+            )
+        )
+        textPages.last().textLines.add(textLine)
+        return durY + paragraphSpacing / 10f
+    }
+
     /**
      * 排版图片
      */
